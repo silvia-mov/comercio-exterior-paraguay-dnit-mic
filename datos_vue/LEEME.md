@@ -8,6 +8,13 @@ Una carpeta por año (2011 a 2026) con un archivo Excel por mes, **tal como est�
 la VUE**, con su nombre original (copiados en noviembre de 2026). Pesan poco, por eso están
 en el repositorio y no en una release.
 
+**Origen de los datos: Ministerio de Industria y Comercio.** Datos publicados por la VUE (MIC)
+como información pública (Ley N.º 5282/2014), bajo la
+[Licencia abierta del Estado Paraguayo](https://datos.vue.gov.py). Los archivos se conservan
+sin modificar, con sus nombres y contenidos originales. Este repositorio no está asociado al
+MIC ni cuenta con su participación, patrocinio o apoyo. Contacto de la VUE para consultas sobre
+los datos: datos@vue.gov.py.
+
 Para juntarlos en una sola tabla: `python python/leer_vue.py`
 (genera `salidas/VUE_certificados_origen.csv`).
 
