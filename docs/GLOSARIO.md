@@ -67,7 +67,7 @@ operaciones de paso ni duplicados. Las reglas, en orden:
 
 ### La tabla oficial de regímenes
 
-`config/regimenes.csv` copia la tabla de regímenes que publica la DNIT en
+`config/regimenes.csv` copia la tabla de regímenes de la DNIT publicada en
 [Datos Abiertos → Acerca de los datos](https://www.dnit.gov.py/web/portal-institucional/datos-abiertos)
 (83 códigos, consultada en noviembre de 2026). La columna `tipo_dnit` es el **tipo oficial**:
 
@@ -76,12 +76,23 @@ operaciones de paso ni duplicados. Las reglas, en orden:
 | Definitivo | ✅ |
 | Suspensivo, Temporal, No aplica, `*`, Declaración de Embarque | ❌ |
 
-Hay **una sola excepción** a la tabla oficial:
+La DNIT publica dos versiones de esta tabla. En la del portal, `ZF2I` (importación de zona
+franca) figura sin tipo; en la versión que incluye la columna **"Cancela DDT"**, figura como
+**Definitivo**. Se usa esta última, así que **no hay excepciones**: se cuentan solo los
+regímenes definitivos.
 
-- **`ZF2I`, importación de zona franca**, se **incluye** aunque la DNIT no le asigna tipo. Es la
-  salida de mercadería de una zona franca hacia el territorio paraguayo (la nacionalización). El
-  ingreso a la zona franca (`ZF01`, suspensivo) no se cuenta, así que no hay duplicación. En 2021
-  fueron USD 1.400 millones (FOB): excluirla subestimaría las importaciones.
+**`ZF2I`, importación de zona franca.** Una zona franca es un área dentro de Paraguay que, para
+la aduana, cuenta como si estuviera fuera del país. La mercadería puede entrar a la zona (`ZF01`,
+suspensivo, **no se cuenta**) y después salir de la zona hacia el resto del país (`ZF2I`,
+definitivo, **sí se cuenta**). Si se contaran los dos, la misma mercadería aparecería dos veces:
+en 2021, `ZF01` sumó USD 1.346 millones y `ZF2I` USD 1.400 millones (FOB), casi todo celulares y
+computadoras de origen chino, por las zonas francas de Ciudad del Este.
+
+**Columna `cancela_ddt`.** "DDT" es el despacho anterior de la misma mercadería. "Cancela DDT =
+Sí" significa que este despacho **cierra** uno anterior que era temporal o suspensivo (por
+ejemplo, `IC09` importa a consumo algo que antes había entrado a un depósito con `IDA3`). Como los
+regímenes suspensivos y temporales no se cuentan, la mercadería se cuenta una sola vez: cuando se
+cierra con el definitivo.
 
 Además, `EC06, EC07, EC08, EC10, EC30, EC40, EC50` quedaron marcados `SI` de una versión anterior
 de la configuración. No figuran en la tabla oficial ni aparecen en los datos de 2021; se conservan
