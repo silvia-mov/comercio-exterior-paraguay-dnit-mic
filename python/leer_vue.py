@@ -16,7 +16,7 @@ datos_vue/LEEME.md); este programa reconoce cada uno por su contenido:
     sql   instrucciones de base de datos "Insert into ..." (febrero 2023)
     csv   texto separado por comas
 
-Si un mes está en .xls y también en .csv (2019 y parte de 2020), se usa el .xls.
+Si un mes está en .xls y también en .csv, se usa el .xls.
 
 Uso:
     python python/leer_vue.py
