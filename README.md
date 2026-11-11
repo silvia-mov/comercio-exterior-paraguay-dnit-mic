@@ -64,6 +64,7 @@ producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores e
 │   ├── regimenes.csv              # qué regímenes aduaneros se consideran definitivos
 │   └── columnas.csv               # qué columnas lleva la hoja "Detalle" (SI / NO)
 ├── python/leer_vue.py             # junta los archivos de la VUE en una tabla
+├── python/cruzar_dnit_vue.py      # cruce DNIT (despachos) vs. VUE (certificados de origen)
 ├── datos_vue/<año>/               # certificados de origen de la VUE, 2011–2026 (archivos mensuales)
 ├── docs/GLOSARIO.md               # qué significa cada término, columna y decisión
 ├── docs/figuras.py                # gráficos del README (docs/img/)
@@ -225,6 +226,25 @@ Cómo hacerlo:
 Otras opciones: **Git LFS** (versiona archivos grandes dentro del repositorio, pero la cuota
 gratuita de almacenamiento y descargas es limitada) o simplemente enlazar al portal oficial de
 la DNIT para que cada usuario descargue la versión vigente.
+
+## Cruce con los certificados de origen (VUE)
+
+```bash
+python python/cruzar_dnit_vue.py --anios 2020-2021
+```
+
+Compara, por **año, país de destino y partida** (4 dígitos de la NCM), el valor FOB de los
+certificados de origen de la VUE (carpeta `datos_vue/`) con las exportaciones de la DNIT, separadas
+en con acuerdo y sin acuerdo. Resultado: `salidas/Cruce_DNIT_VUE.xlsx` (hojas *Por año*,
+*Por país*, *Por partida*, *País y partida* y *Notas*). Necesita los archivos de la DNIT de esos
+años en `datos_dnit/`.
+
+Los países se cruzan por el código de la DNIT; las equivalencias de nombres (por ejemplo,
+"HOLANDA" en la VUE es `NL - PAISES BAJOS` en la DNIT) están en `config/paises_vue.csv`.
+
+**No son fuentes equivalentes**: la VUE cuenta todos los certificados de origen (no solo los de
+acuerdos), fecha por emisión del certificado y usa el destino final. Ver el
+[Glosario](docs/GLOSARIO.md#8-datos-de-la-vue-certificados-de-origen).
 
 ## Metodología
 
