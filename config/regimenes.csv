@@ -50,8 +50,8 @@ ZF2E,SI,EXPORTACION DE ZONA FRANCA,
 EVM1,SI,EXPORTACION MAQUILA VIRTUAL,
 DSEM,SI,,
 AB01,SI,,
-EFC1,NO,EXPORTACION COMPLEMENTARIA,"Excluido: en 2021 su FOB repite el valor del despacho original (maíz 13 USD/kg vs 0,2 en EC01); sumarlo duplica"
-IFC1,NO,IMPORTACION DE FRACCIONES COMPLEMENTARIAS,"Excluido: en 2021 su FOB no corresponde a los kilos de la fracción (cemento 1,35 USD/kg vs 0,06 en IC04); sumarlo duplica"
+EFC1,NO,EXPORTACION COMPLEMENTARIA,"Excluido: son las fracciones físicas (camiones) de un despacho EC01 que ya declara todos los kilos y el valor; cada fracción repite el FOB total del despacho original (ej. mayo 2021: EC01 de 85 t por USD 35.190 y 3 EFC1 de ~28 t con USD 35.190 cada uno)"
+IFC1,NO,IMPORTACION DE FRACCIONES COMPLEMENTARIAS,"Excluido: son las fracciones de un despacho IC04 que ya declara todos los kilos y el valor; cada fracción repite el FOB total (ej. mayo 2021: IC04 de 3.100 t de cemento por USD 192.200 y 38 IFC1 con USD 192.200 cada uno)"
 ZF01,NO,DECLARACION DE INGRESO A ZONA FRANCA,Ingreso a zona franca (no es consumo definitivo)
 IDA3,NO,INGRESO A DEPOSITO ADUANERO C/ DOCUMENTO DE TRANSPORTE,Ingreso a depósito (no es consumo definitivo)
 IT02,NO,IMPORTACION TEMPORARIA - MAQUILA CON TRANSFORMACION,Temporario
