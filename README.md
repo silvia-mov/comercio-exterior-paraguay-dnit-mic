@@ -67,6 +67,7 @@ producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores e
 ├── python/leer_vue.py             # junta los archivos de la VUE en una tabla
 ├── python/cruzar_dnit_vue.py      # cruce DNIT (despachos) vs. VUE (certificados de origen)
 ├── datos_vue/<año>/               # certificados de origen de la VUE, 2011–2026 (archivos mensuales)
+├── CHANGELOG.md                   # versiones del código y qué incluye cada una
 ├── docs/GLOSARIO.md               # qué significa cada término, columna y decisión
 ├── docs/figuras.py                # gráficos del README (docs/img/)
 ├── datos_ejemplo/                 # muestra pequeña y real (enero 2025) para probar
