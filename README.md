@@ -58,7 +58,7 @@ producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores e
 ├── python/procesar_despachos.py   # versión Python (pandas)
 ├── python/descargar_dnit.py       # descarga los meses de la DNIT (o del respaldo)
 ├── R/procesar_despachos.R         # versión R / RStudio (data.table)
-├── paraguay-comercio-dnit.Rproj   # abrir en RStudio
+├── comercio-exterior-paraguay-dnit-mic.Rproj   # abrir en RStudio
 ├── config/
 │   ├── acuerdos.csv               # cómo se agrupa cada valor de "acuerdo" de la DNIT
 │   ├── regimenes.csv              # qué regímenes aduaneros se consideran definitivos
@@ -86,7 +86,7 @@ producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores e
    ```
 
    **R / RStudio**
-   - Abra `paraguay-comercio-dnit.Rproj` en RStudio (fija el directorio de trabajo).
+   - Abra `comercio-exterior-paraguay-dnit-mic.Rproj` en RStudio (fija el directorio de trabajo).
    - Abra `R/procesar_despachos.R`, cambie `RUTA_DATOS <- "datos_ejemplo"` y presione **Source**.
    - O por consola: `Rscript R/procesar_despachos.R datos_ejemplo`
 
@@ -99,14 +99,14 @@ Aduanas**: <https://www.dnit.gov.py/web/portal-institucional/datos-abiertos> (de
 archivos mensuales "Nivel Item").
 
 Copias de los archivos mensuales están en las
-[releases de este repositorio](https://github.com/silvia-mov/paraguay-comercio-dnit/releases)
+[releases de este repositorio](https://github.com/silvia-mov/comercio-exterior-paraguay-dnit-mic/releases)
 (una release por año, por ejemplo `datos-2021`).
 
 ## Tres formas de conseguir los datos
 
 | | Cómo | Para quién |
 |---|---|---|
-| **1. Releases de este repositorio** | Entrar a [Releases](https://github.com/silvia-mov/paraguay-comercio-dnit/releases), bajar los meses y copiarlos en `datos_dnit/`. | Quien quiere pocos meses, sin usar código. Es además el **respaldo**: copias guardadas aquí por si el portal de la DNIT se cae o cambia de dirección. |
+| **1. Releases de este repositorio** | Entrar a [Releases](https://github.com/silvia-mov/comercio-exterior-paraguay-dnit-mic/releases), bajar los meses y copiarlos en `datos_dnit/`. | Quien quiere pocos meses, sin usar código. Es además el **respaldo**: copias guardadas aquí por si el portal de la DNIT se cae o cambia de dirección. |
 | **2. Script de descarga** | `python python/descargar_dnit.py --anios 2021` | Quien quiere muchos meses. Baja de la DNIT y, si falla, del respaldo en las releases. |
 | **3. Portal de la DNIT a mano** | [Datos Abiertos](https://www.dnit.gov.py/web/portal-institucional/datos-abiertos) → Descargas → año → mes → CSV "Nivel Item". | Siempre disponible, mes por mes. |
 

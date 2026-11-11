@@ -40,14 +40,14 @@ CARPETA_DESTINO = "datos_dnit"
 PORTAL_DNIT = "https://datosabiertos.aduana.gov.py"
 LISTA_ARCHIVOS_DNIT = PORTAL_DNIT + "/ddaa/mainctrl/listaArchivos"
 # Releases de respaldo: https://github.com/<REPO_GITHUB>/releases/tag/datos-<año>
-REPO_GITHUB = "silvia-mov/paraguay-comercio-dnit"
+REPO_GITHUB = "silvia-mov/comercio-exterior-paraguay-dnit-mic"
 
 # ==============================================================================
 
 RAIZ_REPO = Path(__file__).resolve().parent.parent
 MESES = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO",
          "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"]
-CABECERAS = {"User-Agent": "paraguay-comercio-dnit (descarga de datos abiertos)"}
+CABECERAS = {"User-Agent": "comercio-exterior-paraguay-dnit-mic (descarga de datos abiertos)"}
 
 
 def leer_anios(texto):

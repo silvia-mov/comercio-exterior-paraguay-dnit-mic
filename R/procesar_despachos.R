@@ -4,7 +4,7 @@
 # Filtra el comercio exterior de Paraguay por ACUERDO COMERCIAL y genera
 # estadísticas agregadas (valores FOB/CIF, tributos y presión tributaria).
 #
-# Uso en RStudio: abra el proyecto "paraguay-comercio-dnit.Rproj" (así el
+# Uso en RStudio: abra el proyecto "comercio-exterior-paraguay-dnit-mic.Rproj" (así el
 # directorio de trabajo es la raíz del repositorio), edite RUTA_DATOS y
 # ejecute el script completo (Ctrl + Shift + S / botón "Source").
 #
@@ -74,7 +74,7 @@ if (length(posicionales) > 0) RUTA_DATOS <- posicionales[1]
 
 RUTA_CONFIG <- "config"
 if (!dir.exists(RUTA_CONFIG)) {
-  stop("No se encuentra la carpeta 'config'. Abra 'paraguay-comercio-dnit.Rproj' o ejecute ",
+  stop("No se encuentra la carpeta 'config'. Abra 'comercio-exterior-paraguay-dnit-mic.Rproj' o ejecute ",
        "setwd(\"ruta/al/repositorio\") antes de correr el script.")
 }
 LIMITE_FILAS_EXCEL <- 1048575
