@@ -12,7 +12,8 @@ REGIMEN,NO,Régimen aduanero
 ADUANA,NO,Aduana de despacho
 POSICION_NCM,SI,Código NCM
 DESCRIPCION_PRODUCTO,SI,Descripción del bien
-FOB_DOLAR,SI,Valor FOB en dólares
+VALOR_DOLAR,SI,"Valor en dólares: FOB en exportaciones y CIF en importaciones"
+FOB_DOLAR,NO,Valor FOB en dólares (exportaciones e importaciones)
 CIF_DOLAR,NO,"Valor CIF en dólares (solo importaciones; FOB + flete + seguro)"
 IMPONIBLE_DOLAR,NO,Valor imponible en dólares
 PESO_NETO_KG,NO,Peso neto en kilos

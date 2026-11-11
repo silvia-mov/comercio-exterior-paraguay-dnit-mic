@@ -126,7 +126,7 @@ DIMENSIONES_RESUMEN = ["OPERACION", "TIPO_ACUERDO", "ACUERDO_CONSOLIDADO", "AÑO
                        "PAIS_ORIGEN", "PAIS_PROC_DEST", "MEDIO_TRANSPORTE", "USO"]
 DIMENSIONES_DETALLE = DIMENSIONES_RESUMEN + ["POSICION_NCM", "DESCRIPCION_PRODUCTO"]
 DIMENSIONES_ACUERDO = ["AÑO_INT", "OPERACION", "TIPO_ACUERDO", "ACUERDO_CONSOLIDADO"]
-MEDIDAS = ["PESO_NETO_KG", "FOB_DOLAR", "CIF_DOLAR", "IMPONIBLE_DOLAR",
+MEDIDAS = ["VALOR_DOLAR", "PESO_NETO_KG", "FOB_DOLAR", "CIF_DOLAR", "IMPONIBLE_DOLAR",
            "DERECHO", "TRIBUTOS_INTERNOS", "TOTAL_TRIBUTOS"]
 
 
@@ -384,6 +384,8 @@ def transformar(df, regimenes_si, acuerdos):
     df["IMPONIBLE_DOLAR"] = np.where(df["IMPONIBLE_DOLAR"] > 0, df["IMPONIBLE_DOLAR"],
                                      (df["IMPONIBLE_GS"] / cot).fillna(0.0))
     df["CIF_DOLAR"] = np.where(es_imp, df["FOB_DOLAR"] + df["FLETE_DOLAR"] + df["SEGURO_DOLAR"], 0.0)
+    # Valor del comercio según la convención habitual: exportaciones FOB, importaciones CIF.
+    df["VALOR_DOLAR"] = np.where(es_imp, df["CIF_DOLAR"], df["FOB_DOLAR"])
     df["TRIBUTOS_INTERNOS"] = df[["IVA", "ISC", "SERVICIO", "RENTA", "OTROS"]].sum(axis=1)
     df["TOTAL_TRIBUTOS"] = df["DERECHO"] + df["TRIBUTOS_INTERNOS"]
 

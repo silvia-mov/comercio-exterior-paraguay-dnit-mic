@@ -28,6 +28,7 @@ programa. Si algo del reporte no se entiende, la respuesta debería estar aquí.
 | **FOB** (*Free On Board*) | Valor de la mercadería puesta en el medio de transporte en el país de salida, **sin flete ni seguro internacional**. Es la medida estándar para comparar exportaciones e importaciones. En dólares. |
 | **CIF** (*Cost, Insurance and Freight*) | FOB + flete + seguro. Solo tiene sentido en importaciones (es el valor de la mercadería al llegar). |
 | **Año y mes** | Período en que el despacho fue **cancelado** (cerrado) en la aduana, no cuando se presentó. Así extrae la DNIT los datos: solo despachos en estado *Cancelado* y por fecha de cancelación. |
+| **Empresas** | **No aparecen.** Los datos abiertos de la DNIT no traen el nombre ni el RUC del importador, del exportador ni del despachante, y el número de despacho está cifrado. No se puede saber qué empresa hizo cada operación. |
 | **Cotización** | Tipo de cambio guaraníes por dólar del despacho. Se usa para pasar a dólares los montos que la DNIT publica en guaraníes (tributos e imponible). |
 
 ## 2. Con acuerdo y sin acuerdo
@@ -107,7 +108,7 @@ Ejemplos reales de mayo 2021:
 | Cemento importado | `IC04`: 3.100 t, USD 192.200 | 38 `IFC1`, **cada uno** con USD 192.200 |
 
 Con estos regímenes incluidos, las exportaciones de 2021 daban USD 23.500 millones (imposible);
-sin ellos, USD 8.877 millones. El despacho principal ya trae el valor completo, así que **no se
+sin ellos, USD 8.877 millones (FOB). El despacho principal ya trae el valor completo, así que **no se
 pierde nada** al excluirlos.
 
 ## 4. Las hojas del Excel
@@ -144,7 +145,8 @@ Las columnas de valores se eligen en [`config/columnas.csv`](../config/columnas.
 
 | Columna | Qué es | Cómo se calcula |
 |---|---|---|
-| `FOB_DOLAR` | Valor FOB. **Es la medida principal del reporte.** | Dato de la DNIT. |
+| `VALOR_DOLAR` | **Medida principal del reporte**: FOB en exportaciones y CIF en importaciones, la convención habitual de las estadísticas de comercio (lo que vale la mercadería al salir del país o al llegar). | `FOB_DOLAR` si es exportación; `CIF_DOLAR` si es importación. |
+| `FOB_DOLAR` | Valor FOB (exportaciones e importaciones). | Dato de la DNIT. |
 | `CIF_DOLAR` | Valor CIF (solo importaciones; en exportaciones vale 0). | FOB + flete + seguro. |
 | `PESO_NETO_KG` | Kilos netos. | Dato de la DNIT. |
 | `CONTEO_DESPACHOS` | Cantidad de **despachos distintos**. | Se cuentan los códigos cifrados únicos. |
@@ -171,12 +173,12 @@ Se llaman "efectivas" porque usan lo **realmente pagado**, no el arancel teóric
 
 | Columna | Qué es |
 |---|---|
-| `FOB_DOLAR_CON_ACUERDO` | FOB de los despachos con tipo `PREFERENCIAL` o `MERCOSUR_INTRAZONA`. |
-| `FOB_DOLAR_SIN_ACUERDO` | FOB de los despachos `SIN_ACUERDO`. |
-| `FOB_DOLAR_TOTAL` | Con acuerdo + sin acuerdo. |
-| `FOB_DOLAR_CON_ACUERDO_PCT` | Con acuerdo ÷ total × 100. |
+| `VALOR_DOLAR_CON_ACUERDO` | FOB de los despachos con tipo `PREFERENCIAL` o `MERCOSUR_INTRAZONA`. |
+| `VALOR_DOLAR_SIN_ACUERDO` | FOB de los despachos `SIN_ACUERDO`. |
+| `VALOR_DOLAR_TOTAL` | Con acuerdo + sin acuerdo. |
+| `VALOR_DOLAR_CON_ACUERDO_PCT` | Con acuerdo ÷ total × 100. |
 
-(Si en `config/columnas.csv` se elige otra medida, por ejemplo `CIF_DOLAR`, aparecen las mismas
+(Si en `config/columnas.csv` se elige otra medida, por ejemplo `FOB_DOLAR`, aparecen las mismas
 cuatro columnas para esa medida.)
 
 ## 6. Limitaciones conocidas

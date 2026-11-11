@@ -83,7 +83,8 @@ siquiera se abren (el programa mira el nombre, p. ej. `2021_ENERO_Nivel_Item.csv
 ### Elegir las columnas
 
 En [`config/columnas.csv`](config/columnas.csv), poner `SI` o `NO` en la columna `incluir`
-(se puede editar en Excel). Por defecto el reporte lleva solo el **valor FOB en dólares**.
+(se puede editar en Excel). Por defecto el reporte lleva solo el **valor en dólares**: FOB en
+exportaciones y CIF en importaciones (`VALOR_DOLAR`).
 
 El script procesa **todos** los archivos `.json`, `.txt`, `.csv`, `.xlsx` y `.parquet` de la
 carpeta (y sus subcarpetas) y los consolida en un solo reporte.
@@ -204,7 +205,7 @@ Los regímenes que no figuran en `regimenes.csv` se excluyen. Los acuerdos que n
 
 Verifique siempre los totales contra las estadísticas oficiales publicadas (por ejemplo, las
 del BCP **sin energía eléctrica**, que no pasa por estos despachos). Para 2021 el programa da
-exportaciones por USD 8.877 millones e importaciones por USD 11.830 millones (FOB).
+exportaciones por USD 8.877 millones (FOB) e importaciones por USD 12.842 millones (CIF).
 
 ## Licencia
 
