@@ -6,8 +6,8 @@ negoció cada operación (ALADI, Mercosur con terceros países, sin acuerdo / OM
 
 **Todas las definiciones y decisiones están explicadas en el [Glosario](docs/GLOSARIO.md).**
 
-> Por ahora las opciones para elegir años, meses y columnas están solo en la versión Python;
-> la versión R se actualiza en el próximo paso.
+Las versiones **Python** y **R** aplican la misma metodología, leen la misma configuración y
+producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores en todas las hojas).
 
 ## Estructura
 
@@ -76,6 +76,14 @@ python python/procesar_despachos.py datos_dnit --anios 2021 --meses todos
 python python/procesar_despachos.py datos_dnit --anios 2019-2023
 python python/procesar_despachos.py datos_dnit --anios 2024 --meses enero,febrero,marzo
 ```
+
+En R es igual:
+
+```bash
+Rscript R/procesar_despachos.R datos_dnit --anios 2021 --meses todos
+```
+
+o, en RStudio, editar `ANIOS <- 2021` y `MESES_ELEGIDOS <- "TODOS"` al inicio del script.
 
 Sin `--anios` se juntan todos los años de la carpeta. Los archivos de otros períodos ni
 siquiera se abren (el programa mira el nombre, p. ej. `2021_ENERO_Nivel_Item.csv`).

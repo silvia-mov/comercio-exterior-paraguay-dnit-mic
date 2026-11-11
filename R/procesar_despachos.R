@@ -9,6 +9,10 @@
 # ejecute el script completo (Ctrl + Shift + S / botón "Source").
 #
 # Uso por consola:  Rscript R/procesar_despachos.R "C:/mis_datos/dnit"
+#                   Rscript R/procesar_despachos.R datos_dnit --anios 2019-2021 --meses enero,febrero
+#
+# Las columnas del Excel final ("Detalle") se eligen en config/columnas.csv (SI / NO).
+# Definiciones y decisiones: docs/GLOSARIO.md
 #
 # Acepta los archivos tal como los descarga la DNIT (JSON "nivel item" y
 # "nivel sub item") y también CSV / XLSX / Parquet ya aplanados.
@@ -35,12 +39,22 @@ RUTA_DATOS <- "datos_dnit"
 # Carpeta donde se guardan los resultados.
 RUTA_SALIDAS <- "salidas"
 
+# Años y meses a juntar. ANIOS <- NULL junta todos los años de la carpeta.
+# Ejemplos: ANIOS <- 2021   ANIOS <- 2019:2021
+#           MESES_ELEGIDOS <- "TODOS"   MESES_ELEGIDOS <- c("ENERO", "FEBRERO")
+# También se pueden pasar por consola: --anios 2019-2021 --meses enero,febrero
+ANIOS <- NULL
+MESES_ELEGIDOS <- "TODOS"
+
 # Tipos de acuerdo (columna "tipo" de config/acuerdos.csv) que se conservan.
 # - PREFERENCIAL: comercio negociado bajo un acuerdo comercial.
 # - SIN_ACUERDO: comercio sin preferencia (OMC / NMF), útil como comparación.
 # - MERCOSUR_INTRAZONA: comercio intra-MERCOSUR (ACE 18).
 # Para analizar SOLO lo negociado por acuerdo, deje únicamente "PREFERENCIAL".
-TIPOS_ACUERDO_INCLUIDOS <- c("PREFERENCIAL", "SIN_ACUERDO")
+TIPOS_ACUERDO_INCLUIDOS <- c("PREFERENCIAL", "MERCOSUR_INTRAZONA", "SIN_ACUERDO")
+
+# "Con acuerdo" = comercio que usó una preferencia (ver docs/GLOSARIO.md).
+TIPOS_CON_ACUERDO <- c("PREFERENCIAL", "MERCOSUR_INTRAZONA")
 
 # En exportaciones, conservar solo mercadería de origen paraguayo
 # (excluye reexportaciones de bienes de otro origen).
@@ -49,7 +63,14 @@ EXPORTACIONES_SOLO_ORIGEN_PARAGUAY <- TRUE
 # ==============================================================================
 
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) > 0) RUTA_DATOS <- args[1]
+valor_opcion <- function(nombre) {
+  i <- which(args == nombre)
+  if (length(i) > 0 && i[1] < length(args)) args[i[1] + 1] else NULL
+}
+opcion_anios <- valor_opcion("--anios")
+opcion_meses <- valor_opcion("--meses")
+posicionales <- args[!(args %in% c("--anios", "--meses", opcion_anios, opcion_meses))]
+if (length(posicionales) > 0) RUTA_DATOS <- posicionales[1]
 
 RUTA_CONFIG <- "config"
 if (!dir.exists(RUTA_CONFIG)) {
@@ -117,8 +138,18 @@ DIMENSIONES_RESUMEN <- c("OPERACION", "TIPO_ACUERDO", "ACUERDO_CONSOLIDADO", "AN
                          "PAIS_ORIGEN", "PAIS_PROC_DEST", "MEDIO_TRANSPORTE", "USO")
 DIMENSIONES_DETALLE <- c(DIMENSIONES_RESUMEN, "POSICION_NCM", "DESCRIPCION_PRODUCTO")
 DIMENSIONES_ACUERDO <- c("ANIO_INT", "OPERACION", "TIPO_ACUERDO", "ACUERDO_CONSOLIDADO")
-MEDIDAS <- c("PESO_NETO_KG", "FOB_DOLAR", "CIF_DOLAR", "IMPONIBLE_DOLAR",
+MEDIDAS <- c("VALOR_DOLAR", "PESO_NETO_KG", "FOB_DOLAR", "CIF_DOLAR", "IMPONIBLE_DOLAR",
              "DERECHO", "TRIBUTOS_INTERNOS", "TOTAL_TRIBUTOS")
+
+# Columnas que pueden elegirse en config/columnas.csv (nombre en el CSV -> nombre interno)
+DIMENSIONES_ELEGIBLES <- c(ANIO = "ANIO_INT", MES = "MES_NUM", OPERACION = "OPERACION",
+                           TIPO_ACUERDO = "TIPO_ACUERDO", ACUERDO_CONSOLIDADO = "ACUERDO_CONSOLIDADO",
+                           PAIS_PROC_DEST = "PAIS_PROC_DEST", PAIS_ORIGEN = "PAIS_ORIGEN",
+                           MEDIO_TRANSPORTE = "MEDIO_TRANSPORTE", USO = "USO", REGIMEN = "REGIMEN",
+                           ADUANA = "ADUANA", POSICION_NCM = "POSICION_NCM",
+                           DESCRIPCION_PRODUCTO = "DESCRIPCION_PRODUCTO")
+MEDIDAS_ELEGIBLES <- c(MEDIDAS, "CONTEO_DESPACHOS", "CONTEO_ITEMS", "PRESION_ARANCELARIA_EFECTIVA_PCT",
+                       "PRESION_INTERNA_EFECTIVA_PCT", "PRESION_TRIBUTARIA_TOTAL_PCT")
 
 # Normaliza un nombre de columna para compararlo: sin tildes ni separadores.
 clave <- function(x) {
@@ -145,6 +176,55 @@ a_numero <- function(x) {
   }
   v[is.na(v)] <- 0
   v
+}
+
+# Columnas marcadas con SI en config/columnas.csv, en el orden del archivo.
+cargar_columnas <- function() {
+  ruta <- file.path(RUTA_CONFIG, "columnas.csv")
+  if (!file.exists(ruta)) return(list(dims = names(DIMENSIONES_ELEGIBLES), medidas = MEDIDAS_ELEGIBLES))
+  cfg <- fread(ruta, colClasses = "character", na.strings = NULL, encoding = "UTF-8")
+  elegidas <- clave(cfg[normalizar_texto(incluir) == "SI", columna])  # "AÑO" -> "ANO"
+  elegidas[elegidas == "ANO"] <- "ANIO"
+  conocidas <- c(names(DIMENSIONES_ELEGIBLES), MEDIDAS_ELEGIBLES)
+  desconocidas <- elegidas[!(elegidas %in% clave(conocidas))]
+  if (length(desconocidas) > 0) cat("AVISO: columnas desconocidas en config/columnas.csv (se ignoran):",
+                                    paste(desconocidas, collapse = ", "), "\n")
+  dims <- names(DIMENSIONES_ELEGIBLES)[match(elegidas, clave(names(DIMENSIONES_ELEGIBLES)))]
+  medidas <- MEDIDAS_ELEGIBLES[match(elegidas, clave(MEDIDAS_ELEGIBLES))]
+  dims <- dims[!is.na(dims)]; medidas <- medidas[!is.na(medidas)]
+  if (length(dims) == 0 || length(medidas) == 0) {
+    stop("config/columnas.csv debe tener al menos una columna de texto (p. ej. A\u00d1O) ",
+         "y una de valores (p. ej. VALOR_DOLAR) con SI.")
+  }
+  list(dims = dims, medidas = medidas)
+}
+
+# "2021" -> 2021; "2019-2021" -> 2019:2021; "2019,2021" -> c(2019, 2021)
+leer_rango_anios <- function(texto) {
+  partes <- strsplit(gsub(" ", "", texto), ",")[[1]]
+  anios <- unlist(lapply(partes, function(p) {
+    if (grepl("-", p)) { ab <- as.integer(strsplit(p, "-")[[1]]); seq(min(ab), max(ab)) } else as.integer(p)
+  }))
+  sort(unique(anios[!is.na(anios)]))
+}
+
+leer_meses <- function(x) {
+  if (is.null(x) || length(x) == 0 || toupper(trimws(x[1])) %in% c("", "TODOS")) return("TODOS")
+  partes <- toupper(trimws(unlist(strsplit(x, ","))))
+  n <- ifelse(partes %in% names(MESES), MESES[partes], suppressWarnings(as.integer(partes)))
+  if (any(is.na(n))) stop("Mes no reconocido: ", paste(partes[is.na(n)], collapse = ", "))
+  sort(unique(as.integer(n)))
+}
+
+# Usa el nombre del archivo de la DNIT (p. ej. 2021_ENERO_Nivel_Item.csv) para no abrir
+# archivos de otros períodos. Si el nombre no sigue ese patrón, se lee igual.
+archivo_en_periodo <- function(ruta, anios, meses) {
+  m <- regmatches(toupper(basename(ruta)), regexec("^([0-9]{4})_([A-Z]+)", toupper(basename(ruta))))[[1]]
+  if (length(m) == 0) return(TRUE)
+  anio <- as.integer(m[2]); mes <- unname(MESES[m[3]])
+  if (!is.null(anios) && !(anio %in% anios)) return(FALSE)
+  if (!identical(meses, "TODOS") && !is.na(mes) && !(mes %in% meses)) return(FALSE)
+  TRUE
 }
 
 cargar_config <- function() {
@@ -194,6 +274,8 @@ leer_csv <- function(ruta) {
   columnas <- names(fread(ruta, nrows = 0, encoding = "UTF-8"))
   usar <- columnas_utiles(columnas)
   dt <- fread(ruta, select = usar, colClasses = "character", encoding = "UTF-8", na.strings = NULL)
+  # Comillas dobles escapadas ("") dentro de los textos: se dejan como una sola, igual que Python.
+  for (col in names(dt)) set(dt, j = col, value = gsub('""', '"', dt[[col]], fixed = TRUE))
   claves_item <- usar[clave(usar) %in% clave(c("DESPACHO_CIFRADO", "ITEM"))]
   if (length(claves_item) == 2) dt <- unique(dt, by = claves_item)
   dt
@@ -273,6 +355,8 @@ transformar <- function(dt, cfg) {
   imp_gs[is.na(imp_gs)] <- 0
   dt[, IMPONIBLE_DOLAR := ifelse(IMPONIBLE_DOLAR > 0, IMPONIBLE_DOLAR, imp_gs)]
   dt[, CIF_DOLAR := ifelse(es_imp, FOB_DOLAR + FLETE_DOLAR + SEGURO_DOLAR, 0)]
+  # Valor del comercio según la convención habitual: exportaciones FOB, importaciones CIF.
+  dt[, VALOR_DOLAR := ifelse(es_imp, CIF_DOLAR, FOB_DOLAR)]
   dt[, TRIBUTOS_INTERNOS := IVA + ISC + SERVICIO + RENTA + OTROS]
   dt[, TOTAL_TRIBUTOS := DERECHO + TRIBUTOS_INTERNOS]
 
@@ -297,7 +381,7 @@ agregar <- function(dt, dims) {
   out[, PRESION_INTERNA_EFECTIVA_PCT := pct(TRIBUTOS_INTERNOS)]
   out[, PRESION_TRIBUTARIA_TOTAL_PCT := pct(TOTAL_TRIBUTOS)]
 
-  out[, ANIO := ANIO_INT]
+  if ("ANIO_INT" %in% names(out)) out[, ANIO := ANIO_INT]
   if ("MES_NUM" %in% names(out)) {
     out[, MES := ifelse(MES_NUM %in% 1:12, NUM_A_MES[pmin(MES_NUM, 12L)], "S/D")]
   }
@@ -308,6 +392,24 @@ agregar <- function(dt, dims) {
   resto <- setdiff(dims, c("ANIO_INT", "MES_NUM"))
   final <- c(primeras, resto, setdiff(names(out), c(primeras, resto, dims)))
   out[, final, with = FALSE]
+}
+
+# Por año y operación: con acuerdo, sin acuerdo, total y % con acuerdo (para gráficos).
+totales_por_anio <- function(dt, medidas) {
+  medidas <- medidas[!grepl("_PCT$", medidas) & !startsWith(medidas, "CONTEO")]
+  d <- dt[, c("ANIO_INT", "OPERACION", "TIPO_ACUERDO", medidas), with = FALSE]
+  d[, CON := TIPO_ACUERDO %in% TIPOS_CON_ACUERDO]
+  out <- unique(d[, .(ANIO = ANIO_INT, OPERACION)])
+  for (m in medidas) {
+    t <- d[, .(con = sum(get(m)[CON]), sin = sum(get(m)[!CON])), by = .(ANIO = ANIO_INT, OPERACION)]
+    t[, total := con + sin]
+    t[, pct := ifelse(total > 0, con / total * 100, 0)]
+    setnames(t, c("con", "sin", "total", "pct"),
+             paste0(m, c("_CON_ACUERDO", "_SIN_ACUERDO", "_TOTAL", "_CON_ACUERDO_PCT")))
+    out <- merge(out, t, by = c("ANIO", "OPERACION"))
+  }
+  setorder(out, ANIO, OPERACION)
+  out
 }
 
 # ------------------------------------------------------------------------------
@@ -323,13 +425,13 @@ exportar <- function(hojas, detalle, carpeta) {
   dir.create(carpeta, showWarnings = FALSE, recursive = TRUE)
   ruta_excel <- file.path(carpeta, "Reporte_Comercio_Paraguay_Acuerdos.xlsx")
   if (nrow(detalle) <= LIMITE_FILAS_EXCEL) {
-    hojas[["Detalle NCM"]] <- detalle
+    hojas[["Detalle"]] <- detalle
   } else if (requireNamespace("arrow", quietly = TRUE)) {
-    ruta_det <- file.path(carpeta, "Detalle_NCM_Paraguay.parquet")
+    ruta_det <- file.path(carpeta, "Detalle_Paraguay.parquet")
     arrow::write_parquet(detalle, ruta_det)
     cat("El detalle supera el límite de filas de Excel; se guardó en:", ruta_det, "\n")
   } else {
-    ruta_det <- file.path(carpeta, "Detalle_NCM_Paraguay.csv.gz")
+    ruta_det <- file.path(carpeta, "Detalle_Paraguay.csv.gz")
     fwrite(detalle, ruta_det)
     cat("El detalle supera el límite de filas de Excel; se guardó en:", ruta_det, "\n")
   }
@@ -342,11 +444,17 @@ exportar <- function(hojas, detalle, carpeta) {
 # ------------------------------------------------------------------------------
 
 cat("=== Pipeline de Comercio Exterior DNIT Paraguay ===\n")
+anios <- if (!is.null(opcion_anios)) leer_rango_anios(opcion_anios) else if (!is.null(ANIOS)) sort(ANIOS) else NULL
+meses <- leer_meses(if (!is.null(opcion_meses)) opcion_meses else MESES_ELEGIDOS)
+columnas <- cargar_columnas()
 cat("Carpeta de datos:", RUTA_DATOS, "\n")
+cat("A\u00f1os:", if (is.null(anios)) "todos" else paste(anios, collapse = ", "),
+    "| Meses:", if (identical(meses, "TODOS")) "TODOS" else paste(NUM_A_MES[meses], collapse = ", "), "\n")
 if (!dir.exists(RUTA_DATOS)) dir.create(RUTA_DATOS, recursive = TRUE)
 
 archivos <- list.files(RUTA_DATOS, pattern = "\\.(json|txt|csv|xlsx|parquet)$",
                        full.names = TRUE, recursive = TRUE, ignore.case = TRUE)
+archivos <- archivos[vapply(archivos, archivo_en_periodo, logical(1), anios = anios, meses = meses)]
 
 if (length(archivos) == 0) {
   cat("No se encontraron archivos (.json, .txt, .csv, .xlsx, .parquet).\n",
@@ -377,6 +485,9 @@ if (length(archivos) == 0) {
                                    format(n0 - nrow(base), big.mark = ",")))
 
   todo <- transformar(base, cfg)
+  # Filtro de período también por el contenido (por si un archivo trae otros meses)
+  if (!is.null(anios)) todo <- todo[ANIO_INT %in% anios]
+  if (!identical(meses, "TODOS")) todo <- todo[MES_NUM %in% meses]
   datos <- todo[MOTIVO_EXCLUSION == ""]
   cat(sprintf("Items válidos para el análisis: %s de %s\n",
               format(nrow(datos), big.mark = ","), format(nrow(todo), big.mark = ",")))
@@ -400,11 +511,16 @@ if (length(archivos) == 0) {
         paste(sort(nuevos_acu), collapse = ", "), "\n")
   }
 
+  por_acuerdo <- agregar(datos, DIMENSIONES_ACUERDO)
+  por_acuerdo <- por_acuerdo[, c("ANIO", "OPERACION", "TIPO_ACUERDO", "ACUERDO_CONSOLIDADO",
+                                 columnas$medidas), with = FALSE]
   hojas <- list(
-    "Por acuerdo" = agregar(datos, DIMENSIONES_ACUERDO),
-    "Resumen" = agregar(datos, DIMENSIONES_RESUMEN),
+    "Totales por a\u00f1o" = totales_por_anio(datos, columnas$medidas),
+    "Por acuerdo" = por_acuerdo,
     "Control" = control
   )
-  exportar(hojas, agregar(datos, DIMENSIONES_DETALLE), RUTA_SALIDAS)
+  detalle <- agregar(datos, unname(DIMENSIONES_ELEGIBLES[columnas$dims]))
+  detalle <- detalle[, c(columnas$dims, columnas$medidas), with = FALSE]
+  exportar(hojas, detalle, RUTA_SALIDAS)
   cat("=== Proceso finalizado ===\n")
 }
