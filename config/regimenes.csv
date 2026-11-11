@@ -1,59 +1,91 @@
-codigo,incluir,descripcion,nota
-IC01,SI,,
-IC02,SI,,
-IC03,SI,,
-IC04,SI,IMPORTACION A CONSUMO CON DOCUMENTO DE TRANSPORTE,
-IC05,SI,,
-IC07,SI,,
-IC08,SI,,
-IC09,SI,IMPORTACION A CONSUMO DESDE DEPOSITO ADUANERO,
-IC10,SI,,
-IC12,SI,NACIONA.MAQUILA MATERIAS PRIMAS INSUMOS DESPERDICIOS,
-IC13,SI,,
-IC19,SI,,
-IC20,SI,IMPORTACION ANTICIPADA OEA,
-ICAB,SI,,
-ICL1,SI,,
-ICMA,SI,,
-EC01,SI,EXPORTACION A CONSUMO,
-EC02,SI,EXPORTACION A CONSUMO C/DIT SIN TRANSFORMACION,
-EC03,SI,EXPORTACION A CONSUMO C/DIT CON TRANFORMACION,
-EC04,SI,,
-EC06,SI,,
-EC07,SI,,
-EC08,SI,,
-EC09,SI,REEXPORTACION DESDE DEPOSITO ADUANERO,
-EC10,SI,,
-EC15,SI,,
-EC30,SI,,
-EC40,SI,,
-EC50,SI,,
-ECL1,SI,,
-EM01,SI,EXPORTACION MAQUILA,
-IM04,SI,IMPORTACION MENOR A CONSUMO CON DOCUMENTO DE TRANSPORTE,
-IM05,SI,IMPORTACION MENOR S/ DOC DE TRANS. C/ CODIGO DE BARRAS,
-IM06,SI,DESPACHO SIMPLIFICADO PARA IMPORTACIONES MENORES,
-IM20,SI,,
-IMAR,SI,,
-ID04,SI,IMPORTACION DIPLOMATICA CON DOCUMENTO DE TRANSPORTE,
-ID09,SI,,
-IS01,SI,,
-IRE1,SI,,
-IRE2,SI,,
-IRE3,SI,,
-IRE4,SI,,
-TLI2,SI,,
-TLI3,SI,,
-TLI4,SI,,
-ZF2I,SI,IMPORTACION DE ZONA FRANCA,
-ZF2E,SI,EXPORTACION DE ZONA FRANCA,
-EVM1,SI,EXPORTACION MAQUILA VIRTUAL,
-DSEM,SI,,
-AB01,SI,,
-EFC1,NO,EXPORTACION COMPLEMENTARIA,"Excluido: son las fracciones físicas (camiones) de un despacho EC01 que ya declara todos los kilos y el valor; cada fracción repite el FOB total del despacho original (ej. mayo 2021: EC01 de 85 t por USD 35.190 y 3 EFC1 de ~28 t con USD 35.190 cada uno)"
-IFC1,NO,IMPORTACION DE FRACCIONES COMPLEMENTARIAS,"Excluido: son las fracciones de un despacho IC04 que ya declara todos los kilos y el valor; cada fracción repite el FOB total (ej. mayo 2021: IC04 de 3.100 t de cemento por USD 192.200 y 38 IFC1 con USD 192.200 cada uno)"
-ZF01,NO,DECLARACION DE INGRESO A ZONA FRANCA,Ingreso a zona franca (no es consumo definitivo)
-IDA3,NO,INGRESO A DEPOSITO ADUANERO C/ DOCUMENTO DE TRANSPORTE,Ingreso a depósito (no es consumo definitivo)
-IT02,NO,IMPORTACION TEMPORARIA - MAQUILA CON TRANSFORMACION,Temporario
-IT14,NO,IMPORTACION TEMPORARIA P/TRANSFORM.C/DOC.DE TRANSPORTE,Temporario
-ERMA,NO,REEXPORTACION AERONAVE,Reexportación de aeronave
+codigo,incluir,descripcion,tipo_dnit,operacion_dnit,nota
+DSEM,SI,DESPACHO SIMPLIFICADO DE EXPORTACIONES MENORES,Definitivo,Exportacion,
+EC01,SI,EXPORTACIÓN A CONSUMO,Definitivo,Exportacion,
+EC04,SI,EXPORTACIÓN A CONSUMO DE EXP. C/ RESERVA DE RETORNO,Definitivo,Exportacion,
+IC02,SI,RE-IMPORT DE EXPORTACIÓN TEMPORAL. PERFECCIONA PASIVO,Definitivo,Importacion,
+IC03,SI,REGULARIZACIÓN LEY 608/95,Definitivo,Importacion,
+IC04,SI,IMPORTACIÓN A CONSUMO CON DOCUMENTO DE TRANSPORTE,Definitivo,Importacion,
+IC05,SI,IMPORTACIÓN DIRECTO A CONSUMO C/ DOC. DE TRANSPORTE,Definitivo,Importacion,
+IC13,SI,RE IMPORTACION DE EXPORTACION DEFINITIVA RECHAZADA,Definitivo,Importacion,
+IC06,NO,IMPORTACION DEPOSITO ADUANERO,*,*,Excluido: la DNIT no lo clasifica como definitivo.
+IC07,SI,IMPORTACIÓN A CONSUMO DE IMP.TEMPORAL S/ TRANSFORMACIÓN,Definitivo,Importacion,
+IC08,SI,IMPORTACIÓN A CONSUMO DE IMP. TEMPORAL C/ TRANSFORMACIÓN,Definitivo,Importacion,
+AB01,SI,APROVISIONAMIENTO A BORDO,Definitivo,Exportacion,
+DAAB,NO,DEPÓSITO DE APROVISIONAMIENTO ABORDO,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+ECMA,NO,REEXPORTACION MONTADA,*,*,Excluido: la DNIT no lo clasifica como definitivo.
+IC01,SI,RE-IMPORT DE EXPORTACIÓN TEMPORAL,Definitivo,Importacion,
+IC09,SI,IMPORTACIÓN A CONSUMO DESDE DEPOSITO ADUANERO,Definitivo,Importacion,
+IC12,SI,NACIONALIZACIÓN MAQUILA / MAT PRIMA / INSUMO / DESPERDICIOS,Definitivo,Importacion,
+IC19,SI,NACIONALIZACIÓN DE DEPÓSITO DE OEC,Definitivo,Importacion,
+ICAB,SI,IMPORTACIÓN A CONSUMO DE APROVISIONAMIENTO A BORDO,Definitivo,Importacion,
+EC02,SI,EXPORTACIÓN A CONSUMO C/DIT SIN TRANSFORMACIÓN,Definitivo,Exportacion,
+EC03,SI,EXPORTACIÓN A CONSUMO C/DIT CON TRANSFORMACIÓN,Definitivo,Exportacion,
+ERMA,NO,REEXPORTACION AERONAVE,*,*,Excluido: la DNIT no lo clasifica como definitivo.
+ICMA,SI,NACIONALIZACION DE INGR. A DEP P/MANT. Y REPARAC. DE AERONAVES,Definitivo,Importacion,
+ID04,SI,IMPORTACIÓN DIPLOMÁTICA CON DOCUMENTO DE TRANSPORTE,Definitivo,Importacion,
+ID09,SI,IMPORTACIÓN DIPLOMÁTICA DESDE DEPÓSITO ADUANERO,Definitivo,Importacion,
+EVM1,SI,EXPORTACIÓN MAQUILA VIRTUAL,Definitivo,Exportacion,
+ICL1,SI,NACIONALIZACIÓN LEASING,Definitivo,Importacion,
+IM04,SI,IMPORTACIÓN MENOR A CONSUMO CON DOCUMENTO DE TRANSPORTE,Definitivo,Importacion,
+IT02,NO,IMPORTACIÓN TEMPORARIA - MAQUILA CON TRANSFORMACIÓN.,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+IT03,NO,IMPORTACIÓN TEMPORARIA - MAQUILA SIN TRANSFORMACIÓN.,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+IT04,NO,IMPORTACIÓN TEMPORARIA S/TRANSFORMACIÓN C/DOC. TRANSPORT.,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+IT14,NO,IMPORTACIÓN TEMPORARIA P/TRANSFORM.C/DOC.DE TRANSPORTE,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+EM01,SI,EXPORTACIÓN MAQUILA,Definitivo,Exportacion,
+ET01,NO,EXPORTACIÓN TEMPORAL,Temporal,Exportacion,Excluido: régimen temporal.
+ET02,NO,EXPORTACIÓN TEMPORAL. PERFECCIONA PASIVO,Temporal,Exportacion,Excluido: régimen temporal.
+IDMA,NO,INGR. A PEDOSITO P/MANT. Y REPARACION DE AERONAVES,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+IMAR,SI,IMPORTACION DE MATERIALES AERONAUTICOS REEMPLAZADOS,Definitivo,Importacion,
+IT06,NO,IMP.TEMP. MAQUILA S/TRANSFORM. SOBRE DEP.ALMAC,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+IT16,NO,IMP.TEMP. MAQUILA C/TRANSFORM. SOBRE DEP.ALMAC.,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+IVM1,NO,IMPORTACIÓN MAQUILA VIRTUAL SIN TRASFORMACIÓN,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+SPA1,NO,SUMINISTROS Y PROVISIONES AEREO,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+IML1,NO,IMPORTACIÓN TEMPORARIA LEASING,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+IM05,SI,IMPORTACIÓN MENOR S/ DOC DE TRANS. C/ CÓDIGO DE BARRAS,Definitivo,Importacion,
+ECL1,SI,EXPORTACIÓN DE CONSUMO LEASING,Definitivo,Exportacion,
+ERR1,NO,EXPORTACIÓN C/ RESERVA DE RETORNO,Temporal,Exportacion,Excluido: régimen temporal.
+IM06,SI,DESPACHO SIMPLIFICADO PARA IMPORTACIONES MENORES,Definitivo,Importacion,
+ER04,NO,EXPORT A CONSUMO DE EXP. C/ RESERVA RETORNO C/ TRANF.,No aplica,,Excluido: la DNIT indica que no aplica.
+IC10,SI,IMPORTACIÓN A CONSUMO DE EXP. C/ RESERVA DE RETORNO,Definitivo,Importacion,
+IR10,NO,IMPORT A CONSUMO DE EXP. C/ RESERVA RETORNO C/ TRANF.,No aplica,,Excluido: la DNIT indica que no aplica.
+ZF01,NO,DECLARACIÓN DE INGRESO A ZONA FRANCA,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+IRE1,SI,REMESA EXPRESA - DOCUMENTO,Definitivo,Importacion,
+ZF2E,SI,EXPORTACIÓN DE ZONA FRANCA,Definitivo,Exportacion,
+ZF2M,NO,IMP TEMP DE ZONA FRANCA - MAQUILA CON TRANSFORMACIÓN.,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+ZF3M,NO,IMP TEMP DE ZONA FRANCA - MAQUILA SIN TRANSFORMACIÓN.,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+ZF2T,NO,IMP TEMPORAL DESDE ZONA FRANCA - CON TRANSFORMACIÓN.,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+ZF3T,NO,IMP TEMPORAL DESDE ZONA FRANCA - SIN TRANSFORMACIÓN.,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+IDA3,NO,INGRESO A DEPOSITO ADUANERO C/ DOCUMENTO DE TRANSPORTE,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+IRE2,SI,REMESA EXPRESA - DE 0 A 100 USD,Definitivo,Importacion,
+IRE3,SI,REMESA EXPRESA - DE 100 A 1.000 USD,Definitivo,Importacion,
+EC09,SI,REEXPORTACIÓN DESDE DEPÓSITO ADUANERO,Definitivo,Exportacion,
+TDA3,NO,TRASLADO ENTRE DEPÓSITOS ADUANEROS,Suspensivo,*,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+IRE4,SI,REMESA EXPRESA - HASTA 1.000 USD,Definitivo,Importacion,
+TDA5,NO,TRASLADO DE DEPOSITO DE OEC,Suspensivo,*,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+TLI3,SI,INGRESO A CONSUMO DEFINITIVO,Definitivo,Importacion,
+TLI1,NO,INGRESO A DEPOSITO DE TIENDA LIBRE,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+TLI2,SI,REEXPORTACION,Definitivo,Exportacion,
+TLI4,SI,COMERCIALIZACION EN TIENDA LIBRE,Definitivo,Exportacion,
+ZF2I,SI,IMPORTACIÓN DE ZONA FRANCA,,,"Incluido: es la salida de mercadería de una zona franca hacia el territorio paraguayo (nacionalización). La DNIT no le asigna tipo; el ingreso a la zona franca (ZF01) no se cuenta, así que no hay duplicación."
+EC15,SI,EXPORTACION A CONSUMO CON ENVASE,Definitivo,Exportacion,
+IC20,SI,IMPORTACION ANTICIPADA OEA,Definitivo,Importacion,
+IDA2,NO,TRASLADO A DEPOSITO ADUANERO,,,Excluido: la DNIT no le asigna tipo.
+IFC1,NO,IMPORTACION DE FRACCIONES COMPLEMENTARIAS,*,*,Excluido: son las fracciones de un despacho IC04 que ya declara todos los kilos y el valor; cada fracción repite el FOB total (ej. mayo 2021: IC04 de 3.100 t de cemento por USD 192.200 y 38 IFC1 con USD 192.200 cada uno)
+IM20,SI,DESPACHO MENOR 2.0,Definitivo,Importacion,
+IML2,NO,IMPORTACION MANUAL MODALIDAD LEASING,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+IS01,SI,IMPORTACION DE ASISTENCIA Y SALVAMENTO,Definitivo,Importacion,
+ITL1,NO,IMPORTACION TEMPORARIA DE LEASING,*,*,Excluido: la DNIT no lo clasifica como definitivo.
+MZF1,NO,MOVIMIENTO DE ZONA FRANCA,Suspensivo,*,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+NZF1,NO,INGRESO A ZONA FRANCA MERCADERIAS NAC.,No aplica,,Excluido: la DNIT indica que no aplica.
+XZF1,NO,MOVIMIENTO DE ZONA FRANCA,Suspensivo,*,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+IT20,NO,ADM.TEMP.C/TRANSF SOBRE DEP.INDUSTRIAL.C/DOC.TRANSP,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+IT07,NO,IMPORTACION TEMPORARIA S/TRANSFORM.SOBRE DEP.ALMAC.,Suspensivo,Importacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+EC20,NO,REEXPORTACION SOBRE ADM.TEMP.C/TRANSF.SOBRE DEP.IND.,Suspensivo,Exportacion,"Excluido: régimen suspensivo (temporal, depósito, zona franca o tránsito)."
+EFC1,NO,EXPORTACION COMPLEMENTARIA,Declaracion de Embarque,Exportacion,Excluido: son las fracciones físicas (camiones) de un despacho EC01 que ya declara todos los kilos y el valor; cada fracción repite el FOB total del despacho original (ej. mayo 2021: EC01 de 85 t por USD 35.190 y 3 EFC1 de ~28 t con USD 35.190 cada uno)
+EC06,SI,,,,No figura en la tabla oficial de la DNIT (consultada en noviembre de 2026); se conserva por si aparece en años anteriores. No aparece en los datos de 2021.
+EC07,SI,,,,No figura en la tabla oficial de la DNIT (consultada en noviembre de 2026); se conserva por si aparece en años anteriores. No aparece en los datos de 2021.
+EC08,SI,,,,No figura en la tabla oficial de la DNIT (consultada en noviembre de 2026); se conserva por si aparece en años anteriores. No aparece en los datos de 2021.
+EC10,SI,,,,No figura en la tabla oficial de la DNIT (consultada en noviembre de 2026); se conserva por si aparece en años anteriores. No aparece en los datos de 2021.
+EC30,SI,,,,No figura en la tabla oficial de la DNIT (consultada en noviembre de 2026); se conserva por si aparece en años anteriores. No aparece en los datos de 2021.
+EC40,SI,,,,No figura en la tabla oficial de la DNIT (consultada en noviembre de 2026); se conserva por si aparece en años anteriores. No aparece en los datos de 2021.
+EC50,SI,,,,No figura en la tabla oficial de la DNIT (consultada en noviembre de 2026); se conserva por si aparece en años anteriores. No aparece en los datos de 2021.

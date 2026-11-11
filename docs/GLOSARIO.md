@@ -27,6 +27,7 @@ programa. Si algo del reporte no se entiende, la respuesta debería estar aquí.
 | **Régimen aduanero** (o destinación) | El "tipo" de operación: importación a consumo, exportación definitiva, importación temporal, ingreso a depósito, etc. Se identifica con un código de 4 letras (p. ej. `IC04`, `EC01`). |
 | **FOB** (*Free On Board*) | Valor de la mercadería puesta en el medio de transporte en el país de salida, **sin flete ni seguro internacional**. Es la medida estándar para comparar exportaciones e importaciones. En dólares. |
 | **CIF** (*Cost, Insurance and Freight*) | FOB + flete + seguro. Solo tiene sentido en importaciones (es el valor de la mercadería al llegar). |
+| **Año y mes** | Período en que el despacho fue **cancelado** (cerrado) en la aduana, no cuando se presentó. Así extrae la DNIT los datos: solo despachos en estado *Cancelado* y por fecha de cancelación. |
 | **Cotización** | Tipo de cambio guaraníes por dólar del despacho. Se usa para pasar a dólares los montos que la DNIT publica en guaraníes (tributos e imponible). |
 
 ## 2. Con acuerdo y sin acuerdo
@@ -57,11 +58,33 @@ operaciones de paso ni duplicados. Las reglas, en orden:
 
 | Regla | Por qué |
 |---|---|
-| **Régimen definitivo** (`incluir = SI` en [`config/regimenes.csv`](../config/regimenes.csv)) | Se excluyen operaciones que no son compra/venta definitiva: importación temporal, ingreso a depósito o a zona franca, tránsito, etc. |
+| **Régimen definitivo** (`incluir = SI` en [`config/regimenes.csv`](../config/regimenes.csv)) | Es la recomendación de la propia DNIT ("filtrar por regímenes DEFINITIVOS"). Se excluyen las operaciones que no son compra/venta definitiva: importación temporal, ingreso a depósito o a zona franca, tránsito, etc. |
 | **Exportaciones solo de origen paraguayo** | Se excluyen las reexportaciones de mercadería de otro origen (opción `EXPORTACIONES_SOLO_ORIGEN_PARAGUAY`). |
 | **Tipos de acuerdo incluidos** | Por defecto los tres (`PREFERENCIAL`, `MERCOSUR_INTRAZONA`, `SIN_ACUERDO`), para poder calcular el total del año. |
 | **Ítems duplicados entre archivos** | Si el mismo despacho e ítem aparece dos veces (p. ej. en el archivo de ítem y en el de sub-ítem), se cuenta una vez. |
 | **Regímenes desconocidos** | Si un código de régimen no está en `config/regimenes.csv`, se **excluye** y se avisa. En 2021 aparecieron `DAAB, ERR1, ET02, IDMA, IT04, MZF1, NZF1, SPA1, TLI1` (temporales, depósitos, reservas de retorno, etc.). |
+
+### La tabla oficial de regímenes
+
+`config/regimenes.csv` copia la tabla de regímenes que publica la DNIT en
+[Datos Abiertos → Acerca de los datos](https://www.dnit.gov.py/web/portal-institucional/datos-abiertos)
+(83 códigos, consultada en noviembre de 2026). La columna `tipo_dnit` es el **tipo oficial**:
+
+| `tipo_dnit` | ¿Se cuenta? |
+|---|:---:|
+| Definitivo | ✅ |
+| Suspensivo, Temporal, No aplica, `*`, Declaración de Embarque | ❌ |
+
+Hay **una sola excepción** a la tabla oficial:
+
+- **`ZF2I`, importación de zona franca**, se **incluye** aunque la DNIT no le asigna tipo. Es la
+  salida de mercadería de una zona franca hacia el territorio paraguayo (la nacionalización). El
+  ingreso a la zona franca (`ZF01`, suspensivo) no se cuenta, así que no hay duplicación. En 2021
+  fueron USD 1.400 millones (FOB): excluirla subestimaría las importaciones.
+
+Además, `EC06, EC07, EC08, EC10, EC30, EC40, EC50` quedaron marcados `SI` de una versión anterior
+de la configuración. No figuran en la tabla oficial ni aparecen en los datos de 2021; se conservan
+por si aparecen en años anteriores.
 
 ### Por qué se excluyen EFC1 e IFC1
 
@@ -70,7 +93,8 @@ operaciones de paso ni duplicados. Las reglas, en orden:
 | `EFC1` | Exportación complementaria |
 | `IFC1` | Importación de fracciones complementarias |
 
-Cuando una carga grande se mueve en varios camiones, se hace **un despacho principal** (`EC01`
+Según la tabla oficial, `EFC1` es una "Declaración de Embarque" e `IFC1` es "Fraccionado"; ninguno
+es definitivo. Lo que significan en la práctica: cuando una carga grande se mueve en varios camiones, se hace **un despacho principal** (`EC01`
 en exportación, `IC04` en importación) con **todos los kilos y todo el valor**, y después **un
 despacho complementario por cada fracción**. Cada complementario **repite el FOB total** del
 despacho principal, aunque solo lleve los kilos de su camión. Sumarlos multiplicaría el valor.
