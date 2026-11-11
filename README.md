@@ -62,7 +62,8 @@ producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores e
 ├── config/
 │   ├── acuerdos.csv               # cómo se agrupa cada valor de "acuerdo" de la DNIT
 │   ├── regimenes.csv              # qué regímenes aduaneros se consideran definitivos
-│   └── columnas.csv               # qué columnas lleva la hoja "Detalle" (SI / NO)
+│   ├── columnas.csv               # qué columnas lleva la hoja "Detalle" (SI / NO)
+│   └── paises_vue.csv             # nombres de países de la VUE -> código de país de la DNIT
 ├── python/leer_vue.py             # junta los archivos de la VUE en una tabla
 ├── python/cruzar_dnit_vue.py      # cruce DNIT (despachos) vs. VUE (certificados de origen)
 ├── datos_vue/<año>/               # certificados de origen de la VUE, 2011–2026 (archivos mensuales)
