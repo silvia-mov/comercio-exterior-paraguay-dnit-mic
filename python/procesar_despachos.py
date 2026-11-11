@@ -158,7 +158,11 @@ DIMENSIONES_ELEGIBLES = {"AÑO": "AÑO_INT", "MES": "MES_NUM", "OPERACION": "OPE
                          "MEDIO_TRANSPORTE": "MEDIO_TRANSPORTE", "USO": "USO", "REGIMEN": "REGIMEN",
                          "ADUANA": "ADUANA", "POSICION_NCM": "POSICION_NCM",
                          "DESCRIPCION_PRODUCTO": "DESCRIPCION_PRODUCTO"}
-MEDIDAS_ELEGIBLES = MEDIDAS + ["CONTEO_DESPACHOS", "CONTEO_ITEMS"]
+MEDIDAS_ELEGIBLES = MEDIDAS + ["CONTEO_DESPACHOS", "CONTEO_ITEMS", "PRESION_ARANCELARIA_EFECTIVA_PCT",
+                               "PRESION_INTERNA_EFECTIVA_PCT", "PRESION_TRIBUTARIA_TOTAL_PCT"]
+# "Con acuerdo" = comercio que usó una preferencia: acuerdos de MERCOSUR con terceros,
+# acuerdos ALADI y el propio MERCOSUR (ACE 18). Ver docs/GLOSARIO.md.
+TIPOS_CON_ACUERDO = ["PREFERENCIAL", "MERCOSUR_INTRAZONA"]
 
 
 def cargar_columnas():
@@ -413,6 +417,24 @@ def agregar(df, dimensiones):
     return out[primeras + resto + [c for c in out.columns if c not in primeras + resto + dimensiones]]
 
 
+def totales_por_anio(df, medidas):
+    """Por año y operación: con acuerdo, sin acuerdo, total y % con acuerdo (para gráficos)."""
+    medidas = [m for m in medidas if not m.endswith("_PCT") and not m.startswith("CONTEO")]
+    d = df.assign(GRUPO=np.where(df["TIPO_ACUERDO"].isin(TIPOS_CON_ACUERDO), "CON_ACUERDO", "SIN_ACUERDO"))
+    t = d.pivot_table(index=["AÑO_INT", "OPERACION"], columns="GRUPO", values=medidas,
+                      aggfunc="sum", fill_value=0.0)
+    out = pd.DataFrame(index=t.index)
+    for m in medidas:
+        con = t[(m, "CON_ACUERDO")] if (m, "CON_ACUERDO") in t else 0.0
+        sin = t[(m, "SIN_ACUERDO")] if (m, "SIN_ACUERDO") in t else 0.0
+        out[f"{m}_CON_ACUERDO"] = con
+        out[f"{m}_SIN_ACUERDO"] = sin
+        out[f"{m}_TOTAL"] = con + sin
+        out[f"{m}_CON_ACUERDO_PCT"] = np.where(out[f"{m}_TOTAL"] > 0, con / out[f"{m}_TOTAL"].where(out[f"{m}_TOTAL"] > 0, 1) * 100, 0.0)
+    out = out.reset_index().rename(columns={"AÑO_INT": "AÑO"})
+    return out.sort_values(["AÑO", "OPERACION"])
+
+
 # ------------------------------------------------------------------------------
 # 4. EXPORTACIÓN
 # ------------------------------------------------------------------------------
@@ -427,7 +449,7 @@ def formatear_hoja(writer, nombre, df):
         hoja.write(0, i, col, f_cab)
         if col.endswith("_PCT"):
             hoja.set_column(i, i, 12, f_pct)
-        elif col in MEDIDAS or col.startswith("CONTEO"):
+        elif col.startswith(tuple(MEDIDAS)) or col.startswith("CONTEO"):
             hoja.set_column(i, i, 16, f_usd)
         else:
             largo = df[col].astype(str).str.len().max() if len(df) else 10
@@ -548,9 +570,11 @@ def main():
     if nuevos_acu:
         print(f"AVISO: acuerdos no listados en config/acuerdos.csv (tratados como PREFERENCIAL): {nuevos_acu}")
 
+    por_acuerdo = agregar(datos, DIMENSIONES_ACUERDO)
+    por_acuerdo = por_acuerdo[["AÑO", "OPERACION", "TIPO_ACUERDO", "ACUERDO_CONSOLIDADO"] + medidas_elegidas]
     hojas = {
-        "Por acuerdo": agregar(datos, DIMENSIONES_ACUERDO),
-        "Resumen": agregar(datos, DIMENSIONES_RESUMEN),
+        "Totales por año": totales_por_anio(datos, medidas_elegidas),
+        "Por acuerdo": por_acuerdo,
         "Control": control,
     }
     detalle = agregar(datos, [DIMENSIONES_ELEGIBLES[c] for c in dims_elegidas])

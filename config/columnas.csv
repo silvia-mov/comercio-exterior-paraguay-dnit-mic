@@ -13,7 +13,7 @@ ADUANA,NO,Aduana de despacho
 POSICION_NCM,SI,Código NCM
 DESCRIPCION_PRODUCTO,SI,Descripción del bien
 FOB_DOLAR,SI,Valor FOB en dólares
-CIF_DOLAR,SI,"Valor CIF en dólares (solo importaciones; FOB + flete + seguro)"
+CIF_DOLAR,NO,"Valor CIF en dólares (solo importaciones; FOB + flete + seguro)"
 IMPONIBLE_DOLAR,NO,Valor imponible en dólares
 PESO_NETO_KG,NO,Peso neto en kilos
 DERECHO,NO,Arancel (derecho aduanero) pagado en dólares
@@ -21,3 +21,6 @@ TRIBUTOS_INTERNOS,NO,"IVA, ISC, servicio, renta y otros, en dólares"
 TOTAL_TRIBUTOS,NO,Derecho + tributos internos en dólares
 CONTEO_DESPACHOS,NO,Cantidad de despachos
 CONTEO_ITEMS,NO,Cantidad de ítems
+PRESION_ARANCELARIA_EFECTIVA_PCT,NO,Derecho / imponible × 100
+PRESION_INTERNA_EFECTIVA_PCT,NO,Tributos internos / imponible × 100
+PRESION_TRIBUTARIA_TOTAL_PCT,NO,Total de tributos / imponible × 100

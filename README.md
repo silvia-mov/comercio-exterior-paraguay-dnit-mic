@@ -4,18 +4,22 @@ Código abierto (Python y R) para procesar los **despachos aduaneros de la DNIT 
 y obtener estadísticas del comercio exterior **según el acuerdo comercial** bajo el que se
 negoció cada operación (ALADI, Mercosur con terceros países, sin acuerdo / OMC, etc.).
 
-Ambas versiones aplican exactamente la misma metodología, leen la misma configuración y
-producen el mismo reporte. Use la que prefiera.
+**Todas las definiciones y decisiones están explicadas en el [Glosario](docs/GLOSARIO.md).**
+
+> Por ahora las opciones para elegir años, meses y columnas están solo en la versión Python;
+> la versión R se actualiza en el próximo paso.
 
 ## Estructura
 
 ```
 ├── python/procesar_despachos.py   # versión Python (pandas)
 ├── R/procesar_despachos.R         # versión R / RStudio (data.table)
-├── paraguay-comercio-dnit.Rproj      # abrir en RStudio
+├── paraguay-comercio-dnit.Rproj   # abrir en RStudio
 ├── config/
 │   ├── acuerdos.csv               # cómo se agrupa cada valor de "acuerdo" de la DNIT
-│   └── regimenes.csv              # qué regímenes aduaneros se consideran definitivos
+│   ├── regimenes.csv              # qué regímenes aduaneros se consideran definitivos
+│   └── columnas.csv               # qué columnas lleva la hoja "Detalle" (SI / NO)
+├── docs/GLOSARIO.md               # qué significa cada término, columna y decisión
 ├── datos_ejemplo/                 # muestra pequeña y real (enero 2025) para probar
 └── datos_dnit/                    # AQUÍ van sus archivos reales (no se suben a GitHub)
 ```
@@ -64,6 +68,22 @@ por eso **no forman parte del repositorio**. Cada persona descarga los archivos 
   ```
 
 - o pasa la ruta al ejecutar: `python python/procesar_despachos.py "D:/dnit/2025"`.
+
+### Elegir años y meses
+
+```bash
+python python/procesar_despachos.py datos_dnit --anios 2021 --meses todos
+python python/procesar_despachos.py datos_dnit --anios 2019-2023
+python python/procesar_despachos.py datos_dnit --anios 2024 --meses enero,febrero,marzo
+```
+
+Sin `--anios` se juntan todos los años de la carpeta. Los archivos de otros períodos ni
+siquiera se abren (el programa mira el nombre, p. ej. `2021_ENERO_Nivel_Item.csv`).
+
+### Elegir las columnas
+
+En [`config/columnas.csv`](config/columnas.csv), poner `SI` o `NO` en la columna `incluir`
+(se puede editar en Excel). Por defecto el reporte lleva solo el **valor FOB en dólares**.
 
 El script procesa **todos** los archivos `.json`, `.txt`, `.csv`, `.xlsx` y `.parquet` de la
 carpeta (y sus subcarpetas) y los consolida en un solo reporte.
@@ -139,9 +159,12 @@ motivo queda registrado en la hoja **Control** del reporte.
    - `SIN_ACUERDO`: sin preferencia (OMC / NMF).
    - `MERCOSUR_INTRAZONA`: comercio intra-Mercosur (ACE 18).
 
-   Con `TIPOS_ACUERDO_INCLUIDOS` se elige qué tipos se conservan. Por defecto
-   `PREFERENCIAL` y `SIN_ACUERDO` (para poder comparar); para analizar **estrictamente** el
-   comercio negociado por acuerdo, deje solo `PREFERENCIAL`.
+   Con `TIPOS_ACUERDO_INCLUIDOS` se elige qué tipos se conservan. Por defecto los tres, para
+   poder calcular el total de cada año. **"Con acuerdo" = `PREFERENCIAL` + `MERCOSUR_INTRAZONA`.**
+
+Los regímenes **EFC1** (exportación complementaria) e **IFC1** (importación de fracciones
+complementarias) se excluyen porque repiten el valor de un despacho principal ya contado.
+La explicación, con ejemplos, está en el [Glosario](docs/GLOSARIO.md#por-qué-se-excluyen-efc1-e-ifc1).
 
 **Cálculos** (todo en USD):
 
@@ -156,10 +179,12 @@ motivo queda registrado en la hoja **Control** del reporte.
 
 ### Hojas del reporte
 
-- **Por acuerdo**: totales por año, operación y acuerdo (la vista principal).
-- **Resumen**: además por mes, país de origen, país de procedencia/destino, medio de transporte y uso.
-- **Detalle NCM**: además por posición arancelaria NCM y descripción. Si supera el límite de
-  filas de Excel se guarda aparte en Parquet (o CSV comprimido).
+- **Totales por año**: por año y operación, el valor con acuerdo, sin acuerdo, el total y el
+  % con acuerdo. Es la base para los gráficos.
+- **Por acuerdo**: por año y operación, el valor de cada acuerdo.
+- **Detalle**: las columnas elegidas en `config/columnas.csv` (por defecto: año, operación,
+  acuerdo, país, NCM y descripción). Si supera el límite de filas de Excel se guarda aparte en
+  Parquet (o CSV comprimido).
 - **Control**: items incluidos y excluidos por motivo, régimen y acuerdo, con su valor FOB.
   Sirve para verificar que no se esté perdiendo comercio relevante.
 
@@ -175,11 +200,11 @@ una fila al CSV correspondiente; no hace falta tocar el código:
 Los regímenes que no figuran en `regimenes.csv` se excluyen. Los acuerdos que no figuran en
 `acuerdos.csv` se tratan como `PREFERENCIAL` con la etiqueta "Otro acuerdo (sin clasificar)".
 
-## Fuente de los datos
+## Verificación
 
-Dirección Nacional de Ingresos Tributarios (DNIT), Paraguay: datos de despachos aduaneros
-con número de despacho cifrado. Verifique siempre los totales contra las estadísticas
-oficiales publicadas.
+Verifique siempre los totales contra las estadísticas oficiales publicadas (por ejemplo, las
+del BCP **sin energía eléctrica**, que no pasa por estos despachos). Para 2021 el programa da
+exportaciones por USD 8.877 millones e importaciones por USD 11.830 millones (FOB).
 
 ## Licencia
 
