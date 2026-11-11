@@ -13,6 +13,7 @@ producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores e
 
 ```
 ├── python/procesar_despachos.py   # versión Python (pandas)
+├── python/descargar_dnit.py       # descarga los meses de la DNIT (o del respaldo)
 ├── R/procesar_despachos.R         # versión R / RStudio (data.table)
 ├── paraguay-comercio-dnit.Rproj   # abrir en RStudio
 ├── config/
@@ -51,6 +52,33 @@ archivos mensuales "Nivel Item").
 Copias de los archivos mensuales están en las
 [releases de este repositorio](https://github.com/silvia-mov/paraguay-comercio-dnit/releases)
 (una release por año, por ejemplo `datos-2021`).
+
+## Tres formas de conseguir los datos
+
+| | Cómo | Para quién |
+|---|---|---|
+| **1. Releases de este repositorio** | Entrar a [Releases](https://github.com/silvia-mov/paraguay-comercio-dnit/releases), bajar los meses y copiarlos en `datos_dnit/`. | Quien quiere pocos meses, sin usar código. Es además el **respaldo**: copias guardadas aquí por si el portal de la DNIT se cae o cambia de dirección. |
+| **2. Script de descarga** | `python python/descargar_dnit.py --anios 2021` | Quien quiere muchos meses. Baja de la DNIT y, si falla, del respaldo en las releases. |
+| **3. Portal de la DNIT a mano** | [Datos Abiertos](https://www.dnit.gov.py/web/portal-institucional/datos-abiertos) → Descargas → año → mes → CSV "Nivel Item". | Siempre disponible, mes por mes. |
+
+### El script de descarga
+
+```bash
+python python/descargar_dnit.py --listar                         # qué años y meses publica la DNIT
+python python/descargar_dnit.py --anios 2021                     # un año completo
+python python/descargar_dnit.py --anios 2019-2021 --meses enero  # varios años, un mes
+python python/descargar_dnit.py --anios 2021 --fuente github     # solo del respaldo
+```
+
+- Guarda los archivos en `datos_dnit/<año>/` (no se suben a GitHub).
+- Si un mes ya está bajado (mismo tamaño), lo salta.
+- El portal de la DNIT publica desde **enero de 1997**. Cada mes pesa entre 100 y 160 MB y
+  puede tardar varios minutos; la serie completa son decenas de GB.
+- No necesita instalar nada: usa solo la biblioteca estándar de Python.
+- Cómo funciona: el portal tiene una lista pública de sus archivos
+  (`https://datosabiertos.aduana.gov.py/ddaa/mainctrl/listaArchivos`), la misma que usa la
+  página para armar los botones de "Descargar", y cada archivo tiene una dirección fija
+  (p. ej. `https://datosabiertos.aduana.gov.py/all_data/2021/ENERO/2021_ENERO_Nivel_Item.csv`).
 
 ## Usar los datos reales
 
