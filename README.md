@@ -63,6 +63,8 @@ producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores e
 │   ├── acuerdos.csv               # cómo se agrupa cada valor de "acuerdo" de la DNIT
 │   ├── regimenes.csv              # qué regímenes aduaneros se consideran definitivos
 │   └── columnas.csv               # qué columnas lleva la hoja "Detalle" (SI / NO)
+├── python/leer_vue.py             # junta los archivos de la VUE en una tabla
+├── datos_vue/<año>/               # certificados de origen de la VUE, 2011–2026 (archivos mensuales)
 ├── docs/GLOSARIO.md               # qué significa cada término, columna y decisión
 ├── docs/figuras.py                # gráficos del README (docs/img/)
 ├── datos_ejemplo/                 # muestra pequeña y real (enero 2025) para probar

@@ -12,6 +12,7 @@ programa. Si algo del reporte no se entiende, la respuesta debería estar aquí.
 5. [Las columnas](#5-las-columnas)
 6. [Limitaciones conocidas](#6-limitaciones-conocidas)
 7. [Antes de comparar con otras fuentes](#7-antes-de-comparar-con-otras-fuentes)
+8. [Datos de la VUE (certificados de origen)](#8-datos-de-la-vue-certificados-de-origen)
 
 ---
 
@@ -263,3 +264,32 @@ con datos aduaneros, porque cada una aplica filtros distintos. Antes de comparar
    de oficialización o de embarque.
 7. **Valores atípicos.** Si una sola combinación de producto y país explica una parte grande de la
    diferencia, conviene revisar los despachos de esa celda antes de sacar conclusiones.
+
+## 8. Datos de la VUE (certificados de origen)
+
+La carpeta [`datos_vue/`](../datos_vue) tiene los archivos mensuales de la **Ventanilla Única de
+Exportación (VUE)** con las exportaciones que tramitaron un **certificado de origen**, de 2011 a
+2026. Detalle de cada archivo en [`datos_vue/LEEME.md`](../datos_vue/LEEME.md).
+
+**No son "exportaciones por acuerdo".** Un certificado de origen acredita en qué país se produjo la
+mercadería. Se pide para usar una preferencia de un acuerdo, pero también por otras razones: lo
+exige el comprador o la aduana del destino aunque no haya preferencia, o se usa para preferencias
+unilaterales como el SGP. Los archivos publicados **no indican el tipo de certificado ni el
+acuerdo**, y la columna `CATEGORIA` es el **sector del producto**.
+
+Diferencias con los despachos de la DNIT:
+
+| | VUE | DNIT |
+|---|---|---|
+| Qué cuenta | Certificados de origen emitidos (de cualquier tipo) | Despachos de exportación |
+| Fecha | Emisión del certificado | Cancelación del despacho |
+| Destino | El del certificado (en general, el **destino final**) | El declarado en la aduana (puede ser un país de tránsito, como Argentina o Uruguay) |
+| Acuerdo | No se informa | Campo `ACUERDO` |
+| Producto | Partida de 4 dígitos | NCM completa |
+
+Ejemplo, 2020: la VUE suma USD 6.276 millones, cerca del total exportado según la DNIT
+(USD 6.630 millones) y muy por encima de lo exportado **con acuerdo** (USD 4.021 millones). Unos
+USD 2.000 millones de certificados corresponden a destinos en los que la DNIT no registra uso de
+ningún acuerdo, como Rusia, India, Estados Unidos, Taiwán y Reino Unido. Para cruzar ambas fuentes
+acuerdo por acuerdo haría falta que la VUE publique el tipo de certificado.
+

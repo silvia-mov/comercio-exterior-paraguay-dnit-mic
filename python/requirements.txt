@@ -3,3 +3,6 @@ numpy
 xlsxwriter
 openpyxl
 pyarrow  # opcional: lectura/escritura de Parquet
+xlrd          # leer_vue.py: archivos .xls de la VUE
+beautifulsoup4  # leer_vue.py: archivos de 2011 (página web de Excel)
+html5lib      # leer_vue.py: idem
