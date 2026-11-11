@@ -173,8 +173,8 @@ Se llaman "efectivas" porque usan lo **realmente pagado**, no el arancel teóric
 
 | Columna | Qué es |
 |---|---|
-| `VALOR_DOLAR_CON_ACUERDO` | FOB de los despachos con tipo `PREFERENCIAL` o `MERCOSUR_INTRAZONA`. |
-| `VALOR_DOLAR_SIN_ACUERDO` | FOB de los despachos `SIN_ACUERDO`. |
+| `VALOR_DOLAR_CON_ACUERDO` | Valor (FOB o CIF) de los despachos con tipo `PREFERENCIAL` o `MERCOSUR_INTRAZONA`. |
+| `VALOR_DOLAR_SIN_ACUERDO` | Valor (FOB o CIF) de los despachos `SIN_ACUERDO`. |
 | `VALOR_DOLAR_TOTAL` | Con acuerdo + sin acuerdo. |
 | `VALOR_DOLAR_CON_ACUERDO_PCT` | Con acuerdo ÷ total × 100. |
 
