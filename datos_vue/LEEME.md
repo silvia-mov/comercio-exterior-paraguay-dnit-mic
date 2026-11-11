@@ -15,6 +15,15 @@ sin modificar, con sus nombres y contenidos originales. Este repositorio no est�
 MIC ni cuenta con su participación, patrocinio o apoyo. Contacto de la VUE para consultas sobre
 los datos: datos@vue.gov.py.
 
+## Copias en Excel ("_convertido.xlsx")
+
+Los **22 archivos** que no son un Excel normal (2011 completo, enero a septiembre de 2018 y
+febrero de 2023) tienen al lado una copia que abre en Excel sin avisos, con el sufijo
+`_convertido.xlsx`. Los valores son los mismos; solo cambia el formato del archivo. Cada copia
+tiene una hoja **Origen** con el nombre y el enlace del archivo original y, en 2011, la fecha de
+ejecución del informe. Los originales se mantienen sin cambios, como piden las condiciones de
+reutilización del MIC. Las copias se generan con `python python/convertir_vue.py`.
+
 Para juntarlos en una sola tabla: `python python/leer_vue.py`
 (genera `salidas/VUE_certificados_origen.csv`).
 
@@ -39,9 +48,9 @@ no al exportado con acuerdo. Ver el [Glosario](../docs/GLOSARIO.md#8-datos-de-la
 | Archivo(s) | Particularidad |
 |---|---|
 | 2011, enero a noviembre | No son Excel "real": son páginas web guardadas como `.xls`. Sin columna de capítulo. |
-| 2011, diciembre | Formato de informe web que el programa todavía no puede leer. |
+| 2011, diciembre | Otro formato de informe web (Oracle BI). Sin columna de capítulo. |
 | 2013, marzo | El archivo termina en `.XLS` (mayúsculas). |
-| 2018, enero a julio | Son `.xlsx` con extensión `.xls` (Excel avisa que el formato no coincide; se puede abrir igual). |
+| 2018, enero a septiembre | Son `.xlsx` con extensión `.xls` (Excel avisa que el formato no coincide; se puede abrir igual). |
 | 2019 y 2020 | En la VUE algunos meses también están en `.csv`, con los mismos valores que el `.xls`; aquí se dejaron solo los `.xls`. |
 | 2021 a 2026 | Están en el servidor de la VUE pero la página no los enlaza. |
 | 2023, febrero | No es una planilla: contiene instrucciones de base de datos (`Insert into …`). El programa lo lee igual. |

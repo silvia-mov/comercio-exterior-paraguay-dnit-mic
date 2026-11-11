@@ -62,25 +62,42 @@ def leer_mhtml(ruta):
         html = parte.get_payload(decode=True).decode(parte.get_content_charset() or "windows-1252",
                                                      errors="replace")
         try:
-            for t in pd.read_html(io.StringIO(html), flavor="bs4"):
+            for t in pd.read_html(io.StringIO(html), flavor="bs4", thousands=".", decimal=","):
                 if t.iloc[:, 0].astype(str).str.startswith("Categor").any():
                     tabla = t
                     break
         except ValueError:
             pass
     if tabla is None:
-        raise ValueError("no se encontró la tabla")
-    inicio = tabla.index[tabla.iloc[:, 0].astype(str).str.startswith("Categor")][0]
-    tabla = tabla.iloc[inicio + 1:, :4]
+        tabla = tabla_oracle_bi(mensaje)
+    else:
+        inicio = tabla.index[tabla.iloc[:, 0].astype(str).str.startswith("Categor")][0]
+        tabla = tabla.iloc[inicio + 1:, :4]
     tabla.columns = ["CATEGORIA", "PAISDESTINO", "FOBDOLAR", "TONELADA"]
-    for col in ("FOBDOLAR", "TONELADA"):
-        tabla[col] = pd.to_numeric(tabla[col].astype(str).str.replace(".", "", regex=False)
-                                   .str.replace(",", ".", regex=False), errors="coerce")
+    for col in ("FOBDOLAR", "TONELADA"):   # read_html ya interpretó "1.234,5" como 1234.5
+        tabla[col] = pd.to_numeric(tabla[col], errors="coerce")
     tabla = tabla[tabla["FOBDOLAR"].notna() & ~tabla["CATEGORIA"].astype(str).str.upper().str.contains("TOTAL")]
     anio, mes = re.search(r"_(\d{4})_(\d{2})", Path(ruta).name).groups()
     tabla["ANOMES"] = f"{anio}/{mes}"
     tabla["CAPITULO"] = None
     return tabla
+
+
+def tabla_oracle_bi(mensaje):
+    """Diciembre 2011: informe web de Oracle BI (Descripción, País, Valor FOB, Kilo neto / 1000)."""
+    candidatas = []
+    for parte in mensaje.walk():
+        if parte.get_content_type() != "text/html":
+            continue
+        html = parte.get_payload(decode=True).decode(parte.get_content_charset() or "utf-8", errors="replace")
+        for t in pd.read_html(io.StringIO(html), flavor="bs4", thousands=".", decimal=","):
+            if t.shape[1] == 4 and len(t) > 50:
+                candidatas.append(t)
+    if not candidatas:
+        raise ValueError("no se encontró la tabla")
+    # la tabla de datos es la más "chica" (las demás la contienen anidada)
+    tabla = min(candidatas, key=lambda t: sum(len(str(v)) for v in t.to_numpy().ravel()))
+    return tabla.iloc[:, :4]
 
 
 def leer_sql(ruta):
@@ -113,6 +130,9 @@ def leer(ruta):
     d = d[[c for c in COLUMNAS if c in d.columns]].copy()
     for col in ("FOBDOLAR", "TONELADA"):
         d[col] = pd.to_numeric(d[col], errors="coerce")
+    if "CAPITULO" in d:   # partida de 4 dígitos como texto, con el cero inicial ("0201", no 201)
+        cap = pd.to_numeric(d["CAPITULO"], errors="coerce")
+        d["CAPITULO"] = cap.map(lambda x: f"{int(x):04d}" if pd.notna(x) else None)
     d["ARCHIVO"] = Path(ruta).name
     d["FORMATO"] = fmt
     return d
@@ -127,7 +147,8 @@ def main():
     if not carpeta.is_absolute():
         carpeta = RAIZ_REPO / carpeta
 
-    archivos = sorted(p for p in carpeta.rglob("Exportaciones_*") if p.is_file())
+    # Solo los originales: las copias "_convertido.xlsx" (convertir_vue.py) tienen los mismos datos
+    archivos = sorted(p for p in carpeta.rglob("Exportaciones_*") if p.is_file() and "_convertido" not in p.stem)
     # Un archivo por mes: si hay .xls y .csv del mismo mes, se usa el .xls
     por_mes = {}
     for p in archivos:
