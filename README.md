@@ -4,6 +4,22 @@ Código abierto (Python y R) para procesar los **despachos aduaneros de la DNIT 
 y obtener estadísticas del comercio exterior **según el acuerdo comercial** bajo el que se
 negoció cada operación (ALADI, Mercosur con terceros países, sin acuerdo / OMC, etc.).
 
+## ¿Para qué sirve?
+
+Para medir, con **datos abiertos y métodos públicos**, cuánto exporta e importa Paraguay
+**usando efectivamente cada acuerdo comercial**, y compararlo con el comercio sin preferencia.
+
+- **Abierto**: usa solo los datos públicos de la DNIT; cualquiera puede repetir los cálculos.
+- **Transparente**: cada decisión (qué regímenes se cuentan, cómo se agrupan los acuerdos, qué
+  se excluye y por qué) está escrita en el [Glosario](docs/GLOSARIO.md) y en archivos de
+  configuración que se pueden revisar y cambiar sin programar.
+- **Verificable**: la hoja *Control* muestra todo lo que se dejó afuera, y el código está en
+  Python y en R con resultados idénticos.
+- **Actualizable**: cada mes nuevo que publica la DNIT se agrega con un comando.
+
+Puede usarse como herramienta principal o **para validar y complementar otras bases de
+comercio exterior**.
+
 **Todas las definiciones y decisiones están explicadas en el [Glosario](docs/GLOSARIO.md).**
 
 Las versiones **Python** y **R** aplican la misma metodología, leen la misma configuración y
