@@ -69,16 +69,18 @@ operaciones de paso ni duplicados. Las reglas, en orden:
 
 `config/regimenes.csv` copia la tabla de regímenes de la DNIT publicada en
 [Datos Abiertos → Acerca de los datos](https://www.dnit.gov.py/web/portal-institucional/datos-abiertos)
-(83 códigos, consultada en noviembre de 2026). La columna `tipo_dnit` es el **tipo oficial**:
+(83 códigos, consultadas en noviembre de 2026). La columna `tipo_dnit` es el **tipo oficial**:
 
 | `tipo_dnit` | ¿Se cuenta? |
 |---|:---:|
 | Definitivo | ✅ |
 | Suspensivo, Temporal, No aplica, `*`, Declaración de Embarque | ❌ |
 
-La DNIT publica dos versiones de esta tabla. En la del portal, `ZF2I` (importación de zona
-franca) figura sin tipo; en la versión que incluye la columna **"Cancela DDT"**, figura como
-**Definitivo**. Se usa esta última, así que **no hay excepciones**: se cuentan solo los
+La DNIT publica dos versiones de esta tabla: la de
+[Datos Abiertos → Acerca de los datos](https://www.dnit.gov.py/web/portal-institucional/datos-abiertos)
+y la de [Regímenes Aduaneros](https://www.dnit.gov.py/web/portal-institucional/reg%C3%ADmenes-aduaneros),
+que agrega la columna **"Cancela DDT"**. En la primera, `ZF2I` (importación de zona franca)
+figura sin tipo; en la segunda, figura como **Definitivo**. Se usa la segunda, así que **no hay excepciones**: se cuentan solo los
 regímenes definitivos.
 
 **`ZF2I`, importación de zona franca.** Una zona franca es un área dentro de Paraguay que, para
