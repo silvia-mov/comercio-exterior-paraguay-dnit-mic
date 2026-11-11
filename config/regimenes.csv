@@ -50,8 +50,8 @@ ZF2E,SI,EXPORTACION DE ZONA FRANCA,
 EVM1,SI,EXPORTACION MAQUILA VIRTUAL,
 DSEM,SI,,
 AB01,SI,,
-EFC1,SI,EXPORTACION COMPLEMENTARIA,Agregado: en la muestra de enero 2025 es el mayor régimen de exportación por valor FOB
-IFC1,SI,IMPORTACION DE FRACCIONES COMPLEMENTARIAS,Agregado: complemento de importaciones fraccionadas
+EFC1,NO,EXPORTACION COMPLEMENTARIA,"Excluido: en 2021 su FOB repite el valor del despacho original (maíz 13 USD/kg vs 0,2 en EC01); sumarlo duplica"
+IFC1,NO,IMPORTACION DE FRACCIONES COMPLEMENTARIAS,"Excluido: en 2021 su FOB no corresponde a los kilos de la fracción (cemento 1,35 USD/kg vs 0,06 en IC04); sumarlo duplica"
 ZF01,NO,DECLARACION DE INGRESO A ZONA FRANCA,Ingreso a zona franca (no es consumo definitivo)
 IDA3,NO,INGRESO A DEPOSITO ADUANERO C/ DOCUMENTO DE TRANSPORTE,Ingreso a depósito (no es consumo definitivo)
 IT02,NO,IMPORTACION TEMPORARIA - MAQUILA CON TRANSFORMACION,Temporario

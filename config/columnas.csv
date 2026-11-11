@@ -1,0 +1,23 @@
+columna,incluir,descripcion
+AÑO,SI,Año del despacho
+MES,NO,Mes del despacho
+OPERACION,SI,Importación o exportación
+TIPO_ACUERDO,NO,"PREFERENCIAL, MERCOSUR_INTRAZONA o SIN_ACUERDO"
+ACUERDO_CONSOLIDADO,SI,Acuerdo comercial usado en el despacho (agrupado según config/acuerdos.csv)
+PAIS_PROC_DEST,SI,País de procedencia (importación) o destino (exportación)
+PAIS_ORIGEN,NO,País de origen de la mercadería
+MEDIO_TRANSPORTE,NO,"Camión, barcaza, avión, etc."
+USO,NO,Nuevo / usado
+REGIMEN,NO,Régimen aduanero
+ADUANA,NO,Aduana de despacho
+POSICION_NCM,SI,Código NCM
+DESCRIPCION_PRODUCTO,SI,Descripción del bien
+FOB_DOLAR,SI,Valor FOB en dólares
+CIF_DOLAR,SI,"Valor CIF en dólares (solo importaciones; FOB + flete + seguro)"
+IMPONIBLE_DOLAR,NO,Valor imponible en dólares
+PESO_NETO_KG,NO,Peso neto en kilos
+DERECHO,NO,Arancel (derecho aduanero) pagado en dólares
+TRIBUTOS_INTERNOS,NO,"IVA, ISC, servicio, renta y otros, en dólares"
+TOTAL_TRIBUTOS,NO,Derecho + tributos internos en dólares
+CONTEO_DESPACHOS,NO,Cantidad de despachos
+CONTEO_ITEMS,NO,Cantidad de ítems

@@ -9,6 +9,10 @@ Uso:
     python python/procesar_despachos.py                      # usa RUTA_DATOS
     python python/procesar_despachos.py "C:/mis_datos/dnit"  # ruta por argumento
     python python/procesar_despachos.py datos_ejemplo        # prueba con la muestra
+    python python/procesar_despachos.py datos_dnit --anios 2021 --meses todos
+    python python/procesar_despachos.py datos_dnit --anios 2019-2021 --meses enero,febrero
+
+Las columnas del Excel final ("Detalle") se eligen en config/columnas.csv (SI / NO).
 
 Acepta los archivos tal como los descarga la DNIT (JSON "nivel item" y
 "nivel sub item") y también CSV / XLSX / Parquet ya aplanados.
@@ -16,7 +20,9 @@ Los valores siempre se toman a nivel ITEM: los sub-items solo detallan la
 mercadería y no se suman (sumarlos duplicaría los montos).
 """
 
+import argparse
 import json
+import re
 import sys
 import unicodedata
 from pathlib import Path
@@ -35,12 +41,19 @@ RUTA_DATOS = "datos_dnit"
 # Carpeta donde se guardan los resultados.
 RUTA_SALIDAS = "salidas"
 
+# Años y meses a juntar. AÑOS = None junta todos los años de la carpeta.
+# Ejemplos: AÑOS = [2021]   AÑOS = list(range(2019, 2022))
+#           MESES_ELEGIDOS = "TODOS"   MESES_ELEGIDOS = ["ENERO", "FEBRERO"]
+# También se pueden pasar al correr: --anios 2019-2021 --meses enero,febrero
+AÑOS = None
+MESES_ELEGIDOS = "TODOS"
+
 # Tipos de acuerdo (columna "tipo" de config/acuerdos.csv) que se conservan.
 # - PREFERENCIAL: comercio negociado bajo un acuerdo comercial.
 # - SIN_ACUERDO: comercio sin preferencia (OMC / NMF), útil como comparación.
 # - MERCOSUR_INTRAZONA: comercio intra-MERCOSUR (ACE 18).
 # Para analizar SOLO lo negociado por acuerdo, deje únicamente ["PREFERENCIAL"].
-TIPOS_ACUERDO_INCLUIDOS = ["PREFERENCIAL", "SIN_ACUERDO"]
+TIPOS_ACUERDO_INCLUIDOS = ["PREFERENCIAL", "MERCOSUR_INTRAZONA", "SIN_ACUERDO"]
 
 # En exportaciones, conservar solo mercadería de origen paraguayo
 # (excluye reexportaciones de bienes de otro origen).
@@ -136,6 +149,77 @@ def a_numero(serie):
     s = s.where(~ambos, s.str.replace(".", "", regex=False))
     s = s.str.replace(",", ".", regex=False)
     return pd.to_numeric(s, errors="coerce").fillna(0.0)
+
+
+# Columnas que pueden elegirse en config/columnas.csv
+DIMENSIONES_ELEGIBLES = {"AÑO": "AÑO_INT", "MES": "MES_NUM", "OPERACION": "OPERACION",
+                         "TIPO_ACUERDO": "TIPO_ACUERDO", "ACUERDO_CONSOLIDADO": "ACUERDO_CONSOLIDADO",
+                         "PAIS_PROC_DEST": "PAIS_PROC_DEST", "PAIS_ORIGEN": "PAIS_ORIGEN",
+                         "MEDIO_TRANSPORTE": "MEDIO_TRANSPORTE", "USO": "USO", "REGIMEN": "REGIMEN",
+                         "ADUANA": "ADUANA", "POSICION_NCM": "POSICION_NCM",
+                         "DESCRIPCION_PRODUCTO": "DESCRIPCION_PRODUCTO"}
+MEDIDAS_ELEGIBLES = MEDIDAS + ["CONTEO_DESPACHOS", "CONTEO_ITEMS"]
+
+
+def cargar_columnas():
+    """Columnas marcadas con SI en config/columnas.csv, en el orden del archivo."""
+    ruta = RUTA_CONFIG / "columnas.csv"
+    if not ruta.exists():
+        return list(DIMENSIONES_ELEGIBLES), MEDIDAS_ELEGIBLES
+    cfg = pd.read_csv(ruta, dtype=str, keep_default_na=False)
+    elegidas = [c.strip().upper() for c in cfg.loc[normalizar_texto(cfg["incluir"]) == "SI", "columna"]]
+    desconocidas = [c for c in elegidas if c not in DIMENSIONES_ELEGIBLES and c not in MEDIDAS_ELEGIBLES]
+    if desconocidas:
+        print(f"AVISO: columnas desconocidas en config/columnas.csv (se ignoran): {desconocidas}")
+    dims = [c for c in elegidas if c in DIMENSIONES_ELEGIBLES]
+    medidas = [c for c in elegidas if c in MEDIDAS_ELEGIBLES]
+    if not dims or not medidas:
+        raise SystemExit("config/columnas.csv debe tener al menos una columna de texto "
+                         "(p. ej. AÑO) y una de valores (p. ej. FOB_DOLAR) con SI.")
+    return dims, medidas
+
+
+def leer_rango_anios(texto):
+    """'2021' -> [2021]; '2019-2021' -> [2019, 2020, 2021]; '2019,2021' -> [2019, 2021]."""
+    anios = []
+    for parte in str(texto).replace(" ", "").split(","):
+        if "-" in parte:
+            a, b = (int(x) for x in parte.split("-"))
+            anios += list(range(min(a, b), max(a, b) + 1))
+        elif parte:
+            anios.append(int(parte))
+    return sorted(set(anios))
+
+
+def leer_meses(texto):
+    if texto is None or str(texto).strip().upper() in ("", "TODOS"):
+        return "TODOS"
+    if isinstance(texto, (list, tuple)):
+        partes = texto
+    else:
+        partes = str(texto).split(",")
+    meses = set()
+    for p in partes:
+        p = str(p).strip().upper()
+        n = MESES.get(p, int(p) if p.isdigit() else None)
+        if n is None:
+            raise SystemExit(f"Mes no reconocido: {p}")
+        meses.add(n)
+    return sorted(meses)
+
+
+def archivo_en_periodo(ruta, anios, meses):
+    """Usa el nombre del archivo de la DNIT (p. ej. 2021_ENERO_Nivel_Item.csv) para no
+    abrir archivos de otros períodos. Si el nombre no sigue ese patrón, se lee igual."""
+    m = re.match(r"(\d{4})_([A-ZÁÉÍÓÚ]+)", ruta.name.upper())
+    if not m:
+        return True
+    anio, mes = int(m.group(1)), MESES.get(m.group(2))
+    if anios is not None and anio not in anios:
+        return False
+    if meses != "TODOS" and mes is not None and mes not in meses:
+        return False
+    return True
 
 
 def cargar_config():
@@ -318,12 +402,13 @@ def agregar(df, dimensiones):
                         ("PRESION_TRIBUTARIA_TOTAL_PCT", "TOTAL_TRIBUTOS")]:
         out[nombre] = np.where(imp > 0, out[num] / imp.where(imp > 0, 1) * 100, 0.0)
 
-    out["AÑO"] = out["AÑO_INT"]
+    if "AÑO_INT" in out:
+        out["AÑO"] = out["AÑO_INT"]
     if "MES_NUM" in out:
         out["MES"] = out["MES_NUM"].map(NUM_A_MES).fillna("S/D")
     orden = [c for c in ["AÑO_INT", "MES_NUM", "OPERACION", "TIPO_ACUERDO", "ACUERDO_CONSOLIDADO"] if c in out]
     out = out.sort_values(orden, ascending=[c != "AÑO_INT" for c in orden])
-    primeras = ["AÑO"] + (["MES"] if "MES" in out else [])
+    primeras = [c for c in ("AÑO", "MES") if c in out]
     resto = [c for c in dimensiones if c not in ("AÑO_INT", "MES_NUM")]
     return out[primeras + resto + [c for c in out.columns if c not in primeras + resto + dimensiones]]
 
@@ -355,13 +440,13 @@ def exportar(hojas, detalle, carpeta):
     carpeta.mkdir(parents=True, exist_ok=True)
     ruta_excel = carpeta / "Reporte_Comercio_Paraguay_Acuerdos.xlsx"
     if len(detalle) <= LIMITE_FILAS_EXCEL:
-        hojas = {**hojas, "Detalle NCM": detalle}
+        hojas = {**hojas, "Detalle": detalle}
     else:
-        ruta_det = carpeta / "Detalle_NCM_Paraguay.parquet"
+        ruta_det = carpeta / "Detalle_Paraguay.parquet"
         try:
             detalle.to_parquet(ruta_det, index=False)
         except ImportError:
-            ruta_det = carpeta / "Detalle_NCM_Paraguay.csv.gz"
+            ruta_det = carpeta / "Detalle_Paraguay.csv.gz"
             detalle.to_csv(ruta_det, index=False, encoding="utf-8")
         print(f"El detalle supera el límite de filas de Excel; se guardó en: {ruta_det}")
 
@@ -384,15 +469,27 @@ def resolver_ruta(ruta):
 
 
 def main():
-    ruta_datos = resolver_ruta(sys.argv[1] if len(sys.argv) > 1 else RUTA_DATOS)
+    parser = argparse.ArgumentParser(description="Comercio exterior de Paraguay por acuerdo comercial (DNIT)")
+    parser.add_argument("ruta", nargs="?", default=RUTA_DATOS, help="carpeta con los archivos de la DNIT")
+    parser.add_argument("--anios", help="años a juntar, p. ej. 2021 o 2019-2021 o 2019,2021")
+    parser.add_argument("--meses", help="meses, p. ej. todos o enero,febrero o 1,2")
+    args = parser.parse_args()
+    anios = leer_rango_anios(args.anios) if args.anios else (sorted(AÑOS) if AÑOS else None)
+    meses = leer_meses(args.meses if args.meses else MESES_ELEGIDOS)
+    dims_elegidas, medidas_elegidas = cargar_columnas()
+
+    ruta_datos = resolver_ruta(args.ruta)
     carpeta_salida = resolver_ruta(RUTA_SALIDAS)
     print("=== Pipeline de Comercio Exterior DNIT Paraguay ===")
     print(f"Carpeta de datos: {ruta_datos}")
+    print(f"Años: {anios if anios else 'todos'} | Meses: "
+          f"{meses if meses == 'TODOS' else [NUM_A_MES[m] for m in meses]}")
 
     if not ruta_datos.exists():
         ruta_datos.mkdir(parents=True)
     archivos = sorted(p for p in ruta_datos.rglob("*")
-                      if p.suffix.lower() in (".json", ".txt", ".csv", ".xlsx", ".parquet"))
+                      if p.suffix.lower() in (".json", ".txt", ".csv", ".xlsx", ".parquet")
+                      and archivo_en_periodo(p, anios, meses))
     if not archivos:
         print("No se encontraron archivos (.json, .txt, .csv, .xlsx, .parquet).\n"
               "Coloque los archivos de la DNIT en esa carpeta, edite RUTA_DATOS o pase la ruta\n"
@@ -425,6 +522,13 @@ def main():
         print(f"Se eliminaron {n0 - len(base):,} items duplicados entre archivos.")
 
     todo = transformar(base, regimenes_si, acuerdos)
+    # Filtro de período también por el contenido (por si un archivo trae otros meses)
+    en_periodo = pd.Series(True, index=todo.index)
+    if anios is not None:
+        en_periodo &= todo["AÑO_INT"].isin(anios)
+    if meses != "TODOS":
+        en_periodo &= todo["MES_NUM"].isin(meses)
+    todo = todo[en_periodo]
     datos = todo[todo["MOTIVO_EXCLUSION"] == ""]
     print(f"Items válidos para el análisis: {len(datos):,} de {len(todo):,}")
 
@@ -449,7 +553,9 @@ def main():
         "Resumen": agregar(datos, DIMENSIONES_RESUMEN),
         "Control": control,
     }
-    exportar(hojas, agregar(datos, DIMENSIONES_DETALLE), carpeta_salida)
+    detalle = agregar(datos, [DIMENSIONES_ELEGIBLES[c] for c in dims_elegidas])
+    detalle = detalle[dims_elegidas + medidas_elegidas]
+    exportar(hojas, detalle, carpeta_salida)
     print("=== Proceso finalizado ===")
 
 
