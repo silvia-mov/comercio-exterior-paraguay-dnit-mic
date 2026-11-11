@@ -11,6 +11,7 @@ programa. Si algo del reporte no se entiende, la respuesta debería estar aquí.
 4. [Las hojas del Excel](#4-las-hojas-del-excel)
 5. [Las columnas](#5-las-columnas)
 6. [Limitaciones conocidas](#6-limitaciones-conocidas)
+7. [Antes de comparar con otras fuentes](#7-antes-de-comparar-con-otras-fuentes)
 
 ---
 
@@ -47,6 +48,39 @@ nombre único (`ACUERDO_CONSOLIDADO`) y a un **tipo**:
 **"Con acuerdo" significa que el despacho efectivamente usó la preferencia**, no solo que el
 país socio tiene un acuerdo con Paraguay. Por ejemplo, una venta a Chile declarada `SIN ACUERDO`
 (porque el exportador no presentó el certificado de origen) cuenta como *sin acuerdo*.
+
+### "OMC", "Sin acuerdo" y "Sin dato de acuerdo"
+
+Dentro del tipo `SIN_ACUERDO` el reporte distingue tres etiquetas, porque **no significan lo mismo**:
+
+| Etiqueta en el reporte | Qué trae la DNIT | Qué significa |
+|---|---|---|
+| **Sin acuerdo** | `SIN ACUERDO` | El despacho no pidió ninguna preferencia: se pagó el arancel general. |
+| **OMC (sin preferencia)** | `OMC` | La DNIT usa un código aparte, `OMC`. La OMC **no es un acuerdo preferencial** como los ACE o los TLC: lo que se aplica entre miembros de la OMC es el trato de nación más favorecida (NMF), es decir, el arancel general. Por eso se cuenta como *sin acuerdo*, pero se muestra separado. En 2021 fueron USD 70 millones de importaciones (sobre todo desde Estados Unidos, Países Bajos y México) y casi nada en exportaciones. La DNIT no publica la regla con la que asigna este código. |
+| **Sin dato de acuerdo** | Celda vacía (o `NULL`, `NAN`, etc.) | El despacho **no informa** el acuerdo. No quiere decir que no se usó ninguno: el dato falta. En 2021 no hubo ningún caso. |
+
+### Vacío no es lo mismo que cero
+
+- **En el Excel**, si un acuerdo **no aparece** en un año, es porque no hubo **ningún despacho** con ese
+  código en el período elegido (comercio cero bajo ese código). El reporte no crea filas en cero.
+- **Un despacho con el acuerdo vacío** se muestra como *Sin dato de acuerdo* (ver arriba), para no
+  confundir "no hubo comercio" con "no se sabe".
+
+### Acuerdos vigentes que pueden no tener código propio
+
+Para medir el uso de un acuerdo hace falta que la DNIT lo registre con un código en el campo `ACUERDO`.
+En los datos de 2021 aparecen estos códigos: `MERCOSUR`, `AAP.CE 74`, `AAP.CE 13`, `MERCOCHILE`,
+`MERCOBOLIVIA`, `MERCOSURCOLOMBIA`, `MERCOPERU`, `MERCOSURCAN`, `ALADI-PAR4`, `MERCOSURISRAEL`,
+`MEXICO AAP-38`, `MERCOSUREGIPTO`, `MERCOSURCUBA`, además de `OMC` y `SIN ACUERDO`.
+
+Hay acuerdos vigentes para Paraguay que **conviene revisar año por año** porque pueden no tener un
+código identificable en estos datos: **MERCOSUR–India** (vigente desde 2009), **Paraguay–Taiwán**
+(2017), el **ACE 55 MERCOSUR–México** (sector automotor) y **MERCOSUR–Singapur** (vigente desde el
+1/02/2026). Si un acuerdo no tiene código, su comercio queda dentro de *Sin acuerdo* y **no se puede
+medir su utilización** con estos datos. El acuerdo MERCOSUR–Unión Europea ya está previsto en
+`config/acuerdos.csv` (código `MERCOSURUE`).
+
+### Si aparece un acuerdo nuevo
 
 Si aparece un nombre de acuerdo que no está en `config/acuerdos.csv`, el programa lo trata como
 `PREFERENCIAL`, avisa en pantalla y lo muestra en la hoja **Control** como
@@ -203,3 +237,29 @@ cuatro columnas para esa medida.)
 - **Nombres de países y acuerdos.** La DNIT los escribe distinto según el año; las tablas de
   `config/` los unifican, pero conviene revisar la hoja **Control** cada vez que se agrega un año.
 - **Cifras preliminares.** Los datos abiertos pueden corregirse después de publicados.
+- **Destino declarado, no destino final.** El país de destino es el que figura en el despacho. Muchas
+  exportaciones salen por puertos o territorios de Argentina, Brasil o Uruguay y su destino final es
+  otro. Por eso, en estos datos esos tres países aparecen más altos, y los destinos extrarregionales
+  (India, Perú, Reino Unido, Bangladesh, etc.) más bajos, que en las estadísticas del BCP. El BCP
+  corrige el destino final con la información de los certificados de origen.
+
+## 7. Antes de comparar con otras fuentes
+
+Las cifras de este reporte **no tienen por qué coincidir** con las del BCP u otras bases construidas
+con datos aduaneros, porque cada una aplica filtros distintos. Antes de comparar, conviene revisar:
+
+1. **Duplicaciones.** Un mismo despacho o ítem puede aparecer más de una vez: despachos
+   complementarios que repiten el valor (`EFC1`, `IFC1`, ver sección 3), el mismo ítem en los
+   archivos "Nivel Item" y "Nivel Sub Item", o cambios de estado de una declaración. Un producto que
+   aparece **casi exactamente al doble** que en otra fuente es una señal típica de duplicación.
+2. **Regímenes.** Qué operaciones se cuentan: solo definitivas, o también tránsito, depósito,
+   reexportación, aprovisionamiento, zona franca o regularizaciones. Por ejemplo, exportaciones de
+   combustibles que otra fuente registra en cero suelen venir de regímenes no definitivos.
+3. **Electricidad.** No está en los datos aduaneros (ver sección 6).
+4. **Destino final.** El BCP lo reasigna; aquí es el declarado (ver sección 6).
+5. **Valoración.** Este reporte usa FOB para exportaciones y CIF para importaciones; algunas
+   publicaciones usan FOB para ambas.
+6. **Fecha.** Aquí el mes es el de **cancelación** del despacho; otras fuentes pueden usar la fecha
+   de oficialización o de embarque.
+7. **Valores atípicos.** Si una sola combinación de producto y país explica una parte grande de la
+   diferencia, conviene revisar los despachos de esa celda antes de sacar conclusiones.
