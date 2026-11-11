@@ -1,0 +1,5 @@
+pandas>=2.0
+numpy
+xlsxwriter
+openpyxl
+pyarrow  # opcional: lectura/escritura de Parquet

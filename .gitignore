@@ -1,0 +1,17 @@
+# Datos reales de la DNIT: pesan más de lo que admite GitHub, se guardan solo en local
+datos_dnit/*
+!datos_dnit/LEEME.md
+
+# Resultados generados
+salidas/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# R / RStudio
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
