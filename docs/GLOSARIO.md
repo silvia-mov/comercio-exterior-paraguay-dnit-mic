@@ -41,9 +41,9 @@ nombre único (`ACUERDO_CONSOLIDADO`) y a un **tipo**:
 
 | Tipo | Qué incluye | ¿Cuenta como "con acuerdo"? |
 |---|---|:---:|
-| `MERCOSUR_INTRAZONA` | Comercio con Argentina, Brasil y Uruguay bajo el MERCOSUR (ACE 18). | ✅ |
-| `PREFERENCIAL` | Acuerdos del MERCOSUR con terceros (Chile, Bolivia, Perú, Colombia, Israel, Egipto, etc.) y acuerdos ALADI (bilaterales AAP.CE 13 y 74, AAP.R 38, Preferencia Arancelaria Regional). | ✅ |
-| `SIN_ACUERDO` | Sin preferencia: se pagó el arancel general (NMF / OMC). | ❌ |
+| `MERCOSUR_INTRAZONA` | Comercio con Argentina, Brasil y Uruguay bajo el MERCOSUR (ACE 18). | Sí |
+| `PREFERENCIAL` | Acuerdos del MERCOSUR con terceros (Chile, Bolivia, Perú, Colombia, Israel, Egipto, etc.) y acuerdos ALADI (bilaterales AAP.CE 13 y 74, AAP.R 38, Preferencia Arancelaria Regional). | Sí |
+| `SIN_ACUERDO` | Sin preferencia: se pagó el arancel general (NMF / OMC). | No |
 
 **"Con acuerdo" significa que el despacho efectivamente usó la preferencia**, no solo que el
 país socio tiene un acuerdo con Paraguay. Por ejemplo, una venta a Chile declarada `SIN ACUERDO`
@@ -107,8 +107,8 @@ operaciones de paso ni duplicados. Las reglas, en orden:
 
 | `tipo_dnit` | ¿Se cuenta? |
 |---|:---:|
-| Definitivo | ✅ |
-| Suspensivo, Temporal, No aplica, `*`, Declaración de Embarque | ❌ |
+| Definitivo | Sí |
+| Suspensivo, Temporal, No aplica, `*`, Declaración de Embarque | No |
 
 La DNIT publica dos versiones de esta tabla: la de
 [Datos Abiertos → Acerca de los datos](https://www.dnit.gov.py/web/portal-institucional/datos-abiertos)

@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🇵🇾 Comercio exterior de Paraguay por acuerdo comercial
+# Comercio exterior de Paraguay por acuerdo comercial
 
 **¿Cuánto exporta e importa Paraguay usando efectivamente cada acuerdo comercial?**<br>
 Con los despachos aduaneros públicos de la DNIT, de 1997 a hoy.
@@ -10,39 +10,39 @@ Con los despachos aduaneros públicos de la DNIT, de 1997 a hoy.
 ![Datos](https://img.shields.io/badge/datos-DNIT%201997–2026-0b6e4f)
 ![Licencia](https://img.shields.io/badge/licencia-MIT-green)
 
-[📊 Resultados](#-resultados-2021) · [🎯 Para qué sirve](#-para-qué-sirve) · [🚀 Inicio rápido](#-inicio-rápido) · [📥 Datos](#-tres-formas-de-conseguir-los-datos) · [📖 Glosario](docs/GLOSARIO.md)
+[Resultados](#resultados-2021) · [Para qué sirve](#para-qué-sirve) · [Inicio rápido](#inicio-rápido) · [Datos](#tres-formas-de-conseguir-los-datos) · [Glosario](docs/GLOSARIO.md)
 
 </div>
 
 ---
 
-## 📊 Resultados 2021
+## Resultados 2021
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/acuerdos_2021_dark.png">
   <img alt="Comercio de Paraguay según el acuerdo usado, 2021" src="docs/img/acuerdos_2021_light.png">
 </picture>
 
-| | 🟦 Con acuerdo | ⬜ Sin acuerdo | Total | % con acuerdo |
+| | Con acuerdo | Sin acuerdo | Total | % con acuerdo |
 |---|---:|---:|---:|---:|
-| 🚢 **Exportaciones** (FOB) | USD 5.299 M | USD 3.578 M | USD 8.877 M | **59,7 %** |
-| 📦 **Importaciones** (CIF) | USD 3.732 M | USD 9.110 M | USD 12.842 M | **29,1 %** |
+| **Exportaciones** (FOB) | USD 5.299 M | USD 3.578 M | USD 8.877 M | **59,7 %** |
+| **Importaciones** (CIF) | USD 3.732 M | USD 9.110 M | USD 12.842 M | **29,1 %** |
 
 <sub>"Con acuerdo" = el despacho usó una preferencia: MERCOSUR (ACE 18), acuerdos del MERCOSUR con
 terceros y acuerdos ALADI. Sin electricidad (no pasa por la aduana). Detalle en el [Glosario](docs/GLOSARIO.md).</sub>
 
-## 🎯 Para qué sirve
+## Para qué sirve
 
 Para medir, con **datos abiertos y métodos públicos**, cuánto exporta e importa Paraguay
 **usando efectivamente cada acuerdo comercial**, y compararlo con el comercio sin preferencia.
 
-- 🔓 **Abierto**: usa solo los datos públicos de la DNIT; cualquiera puede repetir los cálculos.
-- 🔎 **Transparente**: cada decisión (qué regímenes se cuentan, cómo se agrupan los acuerdos, qué
+- **Abierto**: usa solo los datos públicos de la DNIT; cualquiera puede repetir los cálculos.
+- **Transparente**: cada decisión (qué regímenes se cuentan, cómo se agrupan los acuerdos, qué
   se excluye y por qué) está escrita en el [Glosario](docs/GLOSARIO.md) y en archivos de
   configuración que se pueden revisar y cambiar sin programar.
-- ✅ **Verificable**: la hoja *Control* muestra todo lo que se dejó afuera, y el código está en
+- **Verificable**: la hoja *Control* muestra todo lo que se dejó afuera, y el código está en
   Python y en R con resultados idénticos.
-- 🔄 **Actualizable**: cada mes nuevo que publica la DNIT se agrega con un comando.
+- **Actualizable**: cada mes nuevo que publica la DNIT se agrega con un comando.
 
 Puede usarse como herramienta principal o **para validar y complementar otras bases de
 comercio exterior**.
@@ -52,7 +52,7 @@ comercio exterior**.
 Las versiones **Python** y **R** aplican la misma metodología, leen la misma configuración y
 producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores en todas las hojas).
 
-## 🗂️ Estructura
+## Estructura
 
 ```
 ├── python/procesar_despachos.py   # versión Python (pandas)
@@ -69,7 +69,7 @@ producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores e
 └── datos_dnit/                    # AQUÍ van sus archivos reales (no se suben a GitHub)
 ```
 
-## 🚀 Inicio rápido
+## Inicio rápido
 
 1. Descargue o clone el repositorio (botón verde **Code → Download ZIP**).
 2. Pruebe con la muestra incluida:
@@ -87,7 +87,7 @@ producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores e
 
 3. El reporte queda en `salidas/Reporte_Comercio_Paraguay_Acuerdos.xlsx`.
 
-## 🏛️ Fuente de los datos
+## Fuente de los datos
 
 Datos abiertos de la **Dirección Nacional de Ingresos Tributarios (DNIT) – Gerencia General de
 Aduanas**: <https://www.dnit.gov.py/web/portal-institucional/datos-abiertos> (despachos aduaneros,
@@ -97,7 +97,7 @@ Copias de los archivos mensuales están en las
 [releases de este repositorio](https://github.com/silvia-mov/paraguay-comercio-dnit/releases)
 (una release por año, por ejemplo `datos-2021`).
 
-## 📥 Tres formas de conseguir los datos
+## Tres formas de conseguir los datos
 
 | | Cómo | Para quién |
 |---|---|---|
@@ -124,7 +124,7 @@ python python/descargar_dnit.py --anios 2021 --fuente github     # solo del resp
   página para armar los botones de "Descargar", y cada archivo tiene una dirección fija
   (p. ej. `https://datosabiertos.aduana.gov.py/all_data/2021/ENERO/2021_ENERO_Nivel_Item.csv`).
 
-## 💾 Usar los datos reales
+## Usar los datos reales
 
 Los archivos de la DNIT pesan mucho más que los 25 MB que GitHub permite subir por la web,
 por eso **no forman parte del repositorio**. Cada persona descarga los archivos de la DNIT y:
@@ -224,7 +224,7 @@ Otras opciones: **Git LFS** (versiona archivos grandes dentro del repositorio, p
 gratuita de almacenamiento y descargas es limitada) o simplemente enlazar al portal oficial de
 la DNIT para que cada usuario descargue la versión vigente.
 
-## 🔍 Metodología
+## Metodología
 
 Cada item de cada despacho pasa por estos filtros (en este orden). Lo que se excluye y el
 motivo queda registrado en la hoja **Control** del reporte.
@@ -269,7 +269,7 @@ La explicación, con ejemplos, está en el [Glosario](docs/GLOSARIO.md#por-qué-
 - **Control**: items incluidos y excluidos por motivo, régimen y acuerdo, con su valor FOB.
   Sirve para verificar que no se esté perdiendo comercio relevante.
 
-## ⚙️ Mantener la configuración
+## Mantener la configuración
 
 Si la DNIT agrega un régimen o un nombre de acuerdo nuevo, el script lo avisa en pantalla y
 en la hoja Control (`REGIMEN_EN_CONFIG = NO` / `ACUERDO_EN_CONFIG = NO`). Basta con agregar
@@ -281,12 +281,12 @@ una fila al CSV correspondiente; no hace falta tocar el código:
 Los regímenes que no figuran en `regimenes.csv` se excluyen. Los acuerdos que no figuran en
 `acuerdos.csv` se tratan como `PREFERENCIAL` con la etiqueta "Otro acuerdo (sin clasificar)".
 
-## ✅ Verificación
+## Verificación
 
 Verifique siempre los totales contra las estadísticas oficiales publicadas (por ejemplo, las
 del BCP **sin energía eléctrica**, que no pasa por estos despachos). Para 2021 el programa da
 exportaciones por USD 8.877 millones (FOB) e importaciones por USD 12.842 millones (CIF).
 
-## 📄 Licencia
+## Licencia
 
 Código bajo licencia [MIT](LICENSE): cualquiera puede usarlo, copiarlo y modificarlo citando la fuente.
