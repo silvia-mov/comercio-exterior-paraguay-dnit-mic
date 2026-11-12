@@ -92,6 +92,15 @@ th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: ri
 th:first-child, td:first-child { text-align: left; }
 th { color: var(--text2); font-weight: 600; }
 .note { font-size: 14px; color: var(--text2); }
+.consulta { background: linear-gradient(120deg, var(--hero1), var(--hero2)); border-radius: 14px; padding: 22px; margin: 28px 0 8px; }
+.consulta h2 { margin-top: 0; }
+.consulta .elegir { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin: 6px 0 14px; font-size: 17px; }
+.consulta select { margin: 0; font-size: 17px; }
+.respuesta { background: var(--panel); border-radius: 12px; padding: 18px 20px; font-size: 19px; line-height: 1.55; }
+.respuesta p { margin: 0 0 10px; max-width: none; }
+.respuesta .chica { font-size: 15px; color: var(--text2); }
+.respuesta b.v { color: var(--accent); }
+#mini svg text { font-size: 11px; }
 select { font: inherit; font-size: 15px; padding: 6px 10px; margin: 0 0 12px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--text); }
 .card img { width: 100%; height: auto; display: block; border-radius: 6px; }
 .dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
@@ -129,6 +138,7 @@ footer { margin-top: 48px; padding: 28px 0 48px; border-top: 1px solid var(--lin
 
 <div class="wrap">
   <nav class="toc" aria-label="Contenido">
+    <a href="#consulta">Consultá un dato</a>
     <a href="#resultados">Utilización</a>
     <a href="#socios">Por socio</a>
     <a href="#por-acuerdo">Por acuerdo</a>
@@ -140,6 +150,20 @@ footer { margin-top: 48px; padding: 28px 0 48px; border-top: 1px solid var(--lin
     <a href="#preguntas">Preguntas frecuentes</a>
     <a href="#fuentes">Fuentes</a>
   </nav>
+
+  <section id="consulta" class="consulta">
+    <h2>Consultá un dato</h2>
+    <p>Elegí un país y un año, y te contamos en palabras simples cuánto le vendió Paraguay y cuánto usó un acuerdo comercial.</p>
+    <div class="elegir">
+      <label>País <select id="c-pais" aria-label="País"></select></label>
+      <label>Año <select id="c-anio" aria-label="Año"></select></label>
+    </div>
+    <div class="respuesta" aria-live="polite">
+      <div id="c-texto">Cargando…</div>
+      <div id="mini" role="img" aria-label="Ventas de Paraguay a este país por año, con y sin acuerdo"></div>
+      <p class="chica">Barras: lo que Paraguay le vendió a ese país cada año. <span style="color:var(--s1)">■</span> con acuerdo · <span style="color:var(--s2)">■</span> sin acuerdo. Valores de la mercadería al salir de Paraguay, según la aduana (DNIT).</p>
+    </div>
+  </section>
 
   <section id="resultados">
     <h2>Seis de cada diez dólares exportados ya usan un acuerdo comercial</h2>
@@ -404,6 +428,63 @@ document.getElementById("tabla").innerHTML =
   D.map(r => { const tot = r[1] + r[2];
     return `<tr><td>${r[6] < 12 ? r[0] + " (ene–sep)" : r[0]}</td><td>${v1(r[4])}</td><td>${v1(tot)}</td><td>${v1(r[3])}</td><td>${v1(r[5])}</td><td>${v1(r[1])}</td><td>${fmt(100*r[1]/tot,1)} %</td></tr>`;
   }).join("") + "</tbody>";
+
+// ---------------- Consultá un dato
+(async () => {
+  let C;
+  try { C = await (await fetch("datos/consulta.json")).json(); }
+  catch (e) { document.getElementById("c-texto").textContent = "No se pudieron cargar los datos."; return; }
+  const sp = document.getElementById("c-pais"), sa = document.getElementById("c-anio");
+  const porCod = Object.fromEntries(C.paises.map(p => [p.c, p]));
+  const g1 = document.createElement("optgroup"); g1.label = "Principales destinos";
+  C.principales.forEach(c => porCod[c] && g1.appendChild(new Option(porCod[c].n, c)));
+  const g2 = document.createElement("optgroup"); g2.label = "Todos los países";
+  C.paises.forEach(p => g2.appendChild(new Option(p.n, p.c)));
+  sp.append(g1, g2);
+  const MESES = ["", "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre"];
+  [...C.anios].reverse().forEach(a => sa.add(new Option(C.parcial[a] ? `${a} (enero a ${MESES[C.parcial[a]]})` : String(a), a)));
+  sp.value = "CL"; sa.value = String(C.anios[C.anios.length - 2]);
+  const usd = v => v >= 1e9 ? `USD ${fmt(v / 1e9, 1)} mil millones` : v >= 1e6 ? `USD ${fmt(v / 1e6, v < 1e7 ? 1 : 0)} millones` : `USD ${fmt(Math.round(v / 1e3))} mil`;
+  function mostrar() {
+    const p = porCod[sp.value], i = C.anios.indexOf(+sa.value), a = C.anios[i];
+    const t = p.t[i] || 0, con = p.a[i] || 0, bcp = p.b[i];
+    const cuando = C.parcial[a] ? `Entre enero y ${MESES[C.parcial[a]]} de ${a}` : `En ${a}`;
+    let h = "";
+    if (t <= 0) {
+      h = `<p>${cuando}, la aduana no registró ventas de Paraguay a <b>${p.n}</b>.</p>`;
+    } else {
+      h = `<p>${cuando}, Paraguay le vendió a <b>${p.n}</b> <b class="v">${usd(t)}</b>.</p>`;
+      if (p.p[i]) h += `<p class="chica">Fue el destino número ${p.p[i]} de las exportaciones paraguayas ese año.</p>`;
+      if (con > 0) {
+        h += `<p>De eso, <b class="v">${usd(con)} (${fmt(100 * con / t)} %)</b> entró a ${p.n} <b>pagando menos impuestos gracias a un acuerdo comercial</b>.</p>`;
+        const j = p.t.findIndex(v => v > 0);
+        if (j >= 0 && j < i) h += `<p class="chica">En ${C.anios[j]}, esa parte era el ${fmt(100 * (p.a[j] || 0) / p.t[j])} %.</p>`;
+      } else {
+        h += `<p>Nada de eso usó un acuerdo comercial: entró a ${p.n} pagando los impuestos normales, porque Paraguay no tiene un acuerdo con ese país o no se usó.</p>`;
+      }
+      if (bcp && Math.abs(bcp - t) / t > 0.25)
+        h += `<p class="chica">Ojo: el país que figura en la aduana no siempre es el destino final, porque parte de la mercadería pasa por puertos de Argentina o Uruguay y sigue viaje. Contando el destino final, el Banco Central registra ${usd(bcp)} para ${p.n}.</p>`;
+    }
+    document.getElementById("c-texto").innerHTML = h;
+    // mini gráfico
+    const host = document.getElementById("mini"), W = Math.max(host.clientWidth, 280), H = 110;
+    const svg = el("svg", {width: W, height: H, viewBox: `0 0 ${W} ${H}`});
+    host.innerHTML = ""; host.appendChild(svg);
+    const max = Math.max(...p.t.map(v => v || 0)) || 1, bw = W / C.anios.length;
+    C.anios.forEach((an, k) => {
+      const tt = p.t[k] || 0, cc = p.a[k] || 0, x = k * bw + bw * .15, w = bw * .7, base = H - 18;
+      const hT = tt / max * (H - 30), hC = cc / max * (H - 30), op = k === i ? 1 : .45;
+      el("rect", {x, y: base - hT, width: w, height: hT - hC, fill: "var(--s2)", opacity: op, rx: 2}, svg);
+      el("rect", {x, y: base - hC, width: w, height: hC, fill: "var(--s1)", opacity: op, rx: 2}, svg);
+      const lejos = Math.abs(k - i) > (W < 500 ? 3 : 1);  // que las etiquetas no se pisen
+      if (k === i || ((k === 0 || k === C.anios.length - 1) && lejos))
+        el("text", {x: x + w / 2, y: H - 4, "text-anchor": "middle", "font-weight": k === i ? 700 : 400}, svg).textContent = an;
+    });
+  }
+  sp.addEventListener("change", mostrar); sa.addEventListener("change", mostrar);
+  addEventListener("resize", mostrar);
+  mostrar();
+})();
 </script>
 </body>
 </html>
