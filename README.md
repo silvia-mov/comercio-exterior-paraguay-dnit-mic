@@ -10,7 +10,7 @@ Con los despachos aduaneros públicos de la DNIT, de 1997 a hoy.
 ![Datos](https://img.shields.io/badge/datos-DNIT%201997–2026-0b6e4f)
 ![Licencia](https://img.shields.io/badge/licencia-MIT-green)
 
-[Resultados](#resultados-2021) · [Para qué sirve](#para-qué-sirve) · [Inicio rápido](#inicio-rápido) · [Datos](#tres-formas-de-conseguir-los-datos) · [Glosario](docs/GLOSARIO.md)
+[Página web](https://silvia-mov.github.io/comercio-exterior-paraguay-dnit-mic/) · [Resultados](#resultados-2021) · [Para qué sirve](#para-qué-sirve) · [Inicio rápido](#inicio-rápido) · [Datos](#tres-formas-de-conseguir-los-datos) · [Glosario](docs/GLOSARIO.md)
 
 </div>
 
@@ -70,6 +70,7 @@ producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores e
 ├── CHANGELOG.md                   # versiones del código y qué incluye cada una
 ├── docs/GLOSARIO.md               # qué significa cada término, columna y decisión
 ├── docs/figuras.py                # gráficos del README (docs/img/)
+├── docs/index.html                # página web del proyecto (GitHub Pages)
 ├── datos_ejemplo/                 # muestra pequeña y real (enero 2025) para probar
 └── datos_dnit/                    # AQUÍ van sus archivos reales (no se suben a GitHub)
 ```

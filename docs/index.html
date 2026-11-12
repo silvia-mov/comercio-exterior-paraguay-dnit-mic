@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comercio exterior de Paraguay por acuerdo comercial | Datos abiertos DNIT y VUE</title>
+<meta name="description" content="Cuánto exporta e importa Paraguay usando efectivamente cada acuerdo comercial (MERCOSUR, ALADI y otros). Series 2011-2026 con datos abiertos de la DNIT y certificados de origen de la VUE (MIC). Código libre en Python y R.">
+<meta name="keywords" content="comercio exterior Paraguay, exportaciones Paraguay, importaciones Paraguay, acuerdos comerciales, MERCOSUR, ALADI, DNIT datos abiertos, aduana Paraguay, certificados de origen, VUE, preferencias arancelarias, FOB, CIF, NCM">
+<link rel="canonical" href="https://silvia-mov.github.io/comercio-exterior-paraguay-dnit-mic/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_PY">
+<meta property="og:title" content="Comercio exterior de Paraguay por acuerdo comercial">
+<meta property="og:description" content="Exportaciones e importaciones de Paraguay que usan efectivamente un acuerdo comercial. Datos abiertos de la DNIT y de la VUE, 2011-2026, con código en Python y R.">
+<meta property="og:url" content="https://silvia-mov.github.io/comercio-exterior-paraguay-dnit-mic/">
+<meta property="og:image" content="https://silvia-mov.github.io/comercio-exterior-paraguay-dnit-mic/img/acuerdos_2021_light.png">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "Comercio exterior de Paraguay por acuerdo comercial (DNIT y VUE, 2011-2026)",
+  "description": "Exportaciones (FOB) e importaciones (CIF) de Paraguay según si el despacho aduanero usó una preferencia de un acuerdo comercial (MERCOSUR, acuerdos del MERCOSUR con terceros y acuerdos ALADI), calculadas con los datos abiertos de despachos de la Dirección Nacional de Ingresos Tributarios (DNIT), y comparadas con los certificados de origen publicados por la Ventanilla Única de Exportación (VUE) del Ministerio de Industria y Comercio.",
+  "url": "https://silvia-mov.github.io/comercio-exterior-paraguay-dnit-mic/",
+  "sameAs": "https://github.com/silvia-mov/comercio-exterior-paraguay-dnit-mic",
+  "keywords": ["comercio exterior", "Paraguay", "acuerdos comerciales", "MERCOSUR", "ALADI", "exportaciones", "importaciones", "certificados de origen", "aduana"],
+  "license": "https://opensource.org/licenses/MIT",
+  "isAccessibleForFree": true,
+  "inLanguage": "es",
+  "temporalCoverage": "2011/2026",
+  "spatialCoverage": {"@type": "Place", "name": "Paraguay"},
+  "creator": {"@type": "Person", "name": "silvia-mov", "url": "https://github.com/silvia-mov"},
+  "isBasedOn": [
+    "https://datosabiertos.aduana.gov.py",
+    "https://www.vue.gov.py"
+  ],
+  "distribution": [{
+    "@type": "DataDownload",
+    "encodingFormat": "text/csv",
+    "contentUrl": "https://github.com/silvia-mov/comercio-exterior-paraguay-dnit-mic/releases"
+  }]
+}
+</script>
+<style>
+:root {
+  --bg: #fbfaf7; --panel: #ffffff; --text: #18181a; --text2: #57564f; --line: #e4e3df;
+  --s1: #2a78d6; --s2: #c9c7bf; --s3: #eb6834; --accent: #0b6e4f; --code: #f1f0ec;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141413; --panel: #1d1d1b; --text: #f0efec; --text2: #b3b2aa; --line: #33332f;
+    --s1: #4b93ea; --s2: #4a4944; --s3: #e0703f; --accent: #3fb48a; --code: #262624;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141413; --panel: #1d1d1b; --text: #f0efec; --text2: #b3b2aa; --line: #33332f;
+  --s1: #4b93ea; --s2: #4a4944; --s3: #e0703f; --accent: #3fb48a; --code: #262624;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+header { padding: 56px 0 32px; border-bottom: 1px solid var(--line); }
+.eyebrow { color: var(--accent); font-weight: 600; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; margin: 0 0 8px; }
+h1 { font-size: clamp(28px, 5vw, 42px); line-height: 1.15; margin: 0 0 16px; letter-spacing: -.01em; }
+.lead { font-size: 19px; color: var(--text2); max-width: 720px; margin: 0 0 24px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { display: inline-block; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px; border: 1px solid var(--line); color: var(--text); background: var(--panel); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+nav.toc { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 14px 0; font-size: 15px; border-bottom: 1px solid var(--line); }
+nav.toc a { color: var(--text2); text-decoration: none; }
+nav.toc a:hover { color: var(--text); }
+section { padding: 40px 0 8px; }
+h2 { font-size: 26px; margin: 0 0 12px; letter-spacing: -.005em; }
+h3 { font-size: 18px; margin: 28px 0 8px; }
+p, li { max-width: 760px; }
+a { color: var(--s1); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 20px 0; }
+.kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.kpi .v { font-size: 30px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.kpi .l { color: var(--text2); font-size: 14px; margin-top: 6px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; margin: 16px 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--text2); margin-bottom: 8px; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.sw.line { height: 3px; border-radius: 2px; vertical-align: 3px; }
+svg text { fill: var(--text2); font-size: 12px; font-family: inherit; }
+.tw { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { color: var(--text2); font-weight: 600; }
+.note { font-size: 14px; color: var(--text2); }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; }
+code { background: var(--code); padding: 1px 5px; border-radius: 4px; }
+pre { background: var(--code); padding: 14px; border-radius: 8px; overflow-x: auto; }
+pre code { padding: 0; background: none; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.grid2 .card { margin: 0; }
+.grid2 h3 { margin-top: 0; }
+details { border-bottom: 1px solid var(--line); padding: 10px 0; max-width: 760px; }
+summary { cursor: pointer; font-weight: 600; }
+footer { margin-top: 48px; padding: 28px 0 48px; border-top: 1px solid var(--line); font-size: 14px; color: var(--text2); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow">Datos abiertos · Paraguay · 2011–2026</p>
+    <h1>Comercio exterior de Paraguay por acuerdo comercial</h1>
+    <p class="lead">¿Cuánto exporta e importa Paraguay <strong>usando efectivamente</strong> un acuerdo comercial? Series anuales calculadas con los despachos aduaneros públicos de la DNIT y comparadas con los certificados de origen de la VUE.</p>
+    <div class="btns">
+      <a class="btn primary" href="https://github.com/silvia-mov/comercio-exterior-paraguay-dnit-mic">Ver el código en GitHub</a>
+      <a class="btn" href="https://github.com/silvia-mov/comercio-exterior-paraguay-dnit-mic/blob/main/docs/GLOSARIO.md">Glosario</a>
+      <a class="btn" href="https://github.com/silvia-mov/comercio-exterior-paraguay-dnit-mic/releases">Descargar datos</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Contenido">
+    <a href="#resultados">Resultados</a>
+    <a href="#vue">DNIT y VUE</a>
+    <a href="#para-que">Para qué sirve</a>
+    <a href="#como-usar">Cómo usarlo</a>
+    <a href="#metodo">Método</a>
+    <a href="#preguntas">Preguntas frecuentes</a>
+    <a href="#fuentes">Fuentes</a>
+  </nav>
+
+  <section id="resultados">
+    <h2>Exportaciones con y sin acuerdo comercial</h2>
+    <p>Valor FOB de las exportaciones de origen paraguayo, según si el despacho usó una preferencia de un acuerdo comercial (MERCOSUR, acuerdos del MERCOSUR con terceros países y acuerdos ALADI) o no.</p>
+
+    <div class="kpis">
+      <div class="kpi"><div class="v">USD 9.795 M</div><div class="l">Exportaciones 2026 (enero a octubre)</div></div>
+      <div class="kpi"><div class="v">61,8 %</div><div class="l">Exportado con acuerdo en 2026 (máximo de la serie: 65,0 % en 2023)</div></div>
+      <div class="kpi"><div class="v">39,6 %</div><div class="l">Exportado con acuerdo en 2011</div></div>
+    </div>
+
+    <div class="card">
+      <div class="legend">
+        <span><span class="sw" style="background:var(--s1)"></span>Con acuerdo</span>
+        <span><span class="sw" style="background:var(--s2)"></span>Sin acuerdo</span>
+        <span><span class="sw line" style="background:var(--s3)"></span>% con acuerdo (eje derecho)</span>
+      </div>
+      <div id="chart1" role="img" aria-label="Gráfico de barras apiladas de exportaciones con y sin acuerdo, 2011 a 2026, con línea del porcentaje con acuerdo"></div>
+      <p class="note">Millones de USD FOB. 2026 incluye de enero a octubre. Fuente: elaboración propia con datos abiertos de la DNIT.</p>
+    </div>
+
+    <h3>Importaciones 2021, ejemplo</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th></th><th>Con acuerdo</th><th>Sin acuerdo</th><th>Total</th><th>% con acuerdo</th></tr></thead>
+        <tbody>
+          <tr><td>Exportaciones (FOB)</td><td>USD 5.299 M</td><td>USD 3.578 M</td><td>USD 8.877 M</td><td>59,7 %</td></tr>
+          <tr><td>Importaciones (CIF)</td><td>USD 3.732 M</td><td>USD 9.110 M</td><td>USD 12.842 M</td><td>29,1 %</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Las importaciones se valoran CIF (incluye flete y seguro) y las exportaciones FOB. El código calcula cualquier año desde 1997.</p>
+  </section>
+
+  <section id="vue">
+    <h2>Despachos (DNIT) frente a certificados de origen (VUE)</h2>
+    <p>La VUE publica el valor de los certificados de origen emitidos. Se podría pensar que coincide con lo que se exporta usando un acuerdo, pero no: se parece mucho más al <strong>total</strong> exportado, porque se emiten certificados también para envíos que no usan una preferencia.</p>
+    <div class="card">
+      <div class="legend">
+        <span><span class="sw line" style="background:var(--s3)"></span>VUE, certificados de origen</span>
+        <span><span class="sw line" style="background:var(--text)"></span>DNIT, total exportado</span>
+        <span><span class="sw line" style="background:var(--s1)"></span>DNIT, exportado con acuerdo</span>
+      </div>
+      <div id="chart2" role="img" aria-label="Gráfico de líneas comparando VUE, total DNIT y DNIT con acuerdo, 2011 a 2026"></div>
+      <p class="note">Millones de USD FOB. En 2022 los archivos de la VUE tienen valores atípicos (octubre y noviembre, partidas 6406 y 3904) que inflan el año. Fuente: elaboración propia con datos de la DNIT y de la VUE. Origen de los datos de la VUE: Ministerio de Industria y Comercio.</p>
+    </div>
+    <div class="tw">
+      <table id="tabla"></table>
+    </div>
+  </section>
+
+  <section id="para-que">
+    <h2>Para qué sirve</h2>
+    <div class="grid2">
+      <div class="card"><h3>Abierto</h3><p>Usa solo datos públicos. Cualquier persona puede repetir los cálculos y obtener las mismas cifras.</p></div>
+      <div class="card"><h3>Transparente</h3><p>Cada decisión (qué regímenes se cuentan, cómo se agrupan los acuerdos, qué se excluye) está escrita en el glosario y en archivos de configuración que se cambian sin programar.</p></div>
+      <div class="card"><h3>Verificable</h3><p>El reporte incluye una hoja de control con todo lo excluido. El código está en Python y en R, con resultados idénticos.</p></div>
+      <div class="card"><h3>Actualizable</h3><p>Cada mes nuevo que publica la DNIT se agrega con un comando. Se pueden elegir años, meses y columnas.</p></div>
+    </div>
+    <p>Sirve para reportes de comercio, para investigaciones sobre el uso de las preferencias arancelarias y para validar o complementar otras bases de comercio exterior.</p>
+  </section>
+
+  <section id="como-usar">
+    <h2>Cómo usarlo</h2>
+    <p>Necesita Python 3.10 o superior (o R 4.x). Desde la carpeta del repositorio:</p>
+<pre><code>pip install -r python/requirements.txt
+python python/descargar_dnit.py --anios 2021
+python python/procesar_despachos.py --anios 2021</code></pre>
+    <p>El resultado es un Excel con las hojas <em>Totales por año</em>, <em>Por acuerdo</em>, <em>Control</em> y <em>Detalle</em>. Para el cruce con los certificados de origen:</p>
+<pre><code>python python/cruzar_dnit_vue.py --anios 2011-2026</code></pre>
+    <p>En RStudio, abra el proyecto <code>.Rproj</code> y ejecute <code>R/procesar_despachos.R</code>. Las instrucciones completas están en el <a href="https://github.com/silvia-mov/comercio-exterior-paraguay-dnit-mic#readme">README</a>.</p>
+  </section>
+
+  <section id="metodo">
+    <h2>Método en pocas palabras</h2>
+    <ul>
+      <li>Se cuentan solo los regímenes aduaneros <strong>definitivos</strong>, según la tabla oficial de regímenes de la DNIT.</li>
+      <li>Se excluyen las fracciones complementarias (EFC1 e IFC1), porque repiten el valor completo del despacho principal y duplicarían los montos.</li>
+      <li>En exportaciones se toma solo el origen paraguayo.</li>
+      <li>"Con acuerdo" incluye las preferencias del MERCOSUR intrazona y los acuerdos preferenciales. "Sin acuerdo" incluye los despachos sin preferencia, los que figuran como OMC y los que no tienen dato de acuerdo.</li>
+      <li>Las fechas corresponden a la cancelación del despacho. La electricidad no pasa por la aduana y no está incluida.</li>
+    </ul>
+    <p>El detalle de cada concepto, columna y decisión está en el <a href="https://github.com/silvia-mov/comercio-exterior-paraguay-dnit-mic/blob/main/docs/GLOSARIO.md">glosario</a>.</p>
+  </section>
+
+  <section id="preguntas">
+    <h2>Preguntas frecuentes</h2>
+    <details><summary>¿Por qué la VUE no coincide con las exportaciones con acuerdo?</summary><p>Porque la VUE registra todos los certificados de origen emitidos, también los de envíos que no usan una preferencia. Además, la VUE usa el país de destino final y la DNIT el país declarado en el despacho, y la fecha de la VUE es la de emisión del certificado, no la de cancelación del despacho.</p></details>
+    <details><summary>¿Aparecen nombres de empresas?</summary><p>No. Los datos abiertos de la DNIT no identifican a importadores ni exportadores.</p></details>
+    <details><summary>¿Qué pasa si la web de la DNIT cambia o deja de funcionar?</summary><p>Los archivos mensuales tienen una copia de respaldo en las versiones (releases) del repositorio, y el programa de descarga la usa automáticamente si el portal no responde.</p></details>
+    <details><summary>¿Por qué importaciones en CIF y exportaciones en FOB?</summary><p>Es la convención habitual: las importaciones se miden con el costo puesto en el país (incluye flete y seguro) y las exportaciones con el valor en la frontera de salida.</p></details>
+    <details><summary>¿Puedo usar estos datos y el código?</summary><p>Sí. El código tiene licencia MIT. Al usar los datos de la VUE, cite "Origen de los datos: Ministerio de Industria y Comercio". Este proyecto es independiente y no cuenta con el respaldo de la DNIT ni del Ministerio.</p></details>
+  </section>
+
+  <section id="fuentes">
+    <h2>Fuentes</h2>
+    <ul>
+      <li>Dirección Nacional de Ingresos Tributarios (DNIT), Datos Abiertos de Aduanas: <a href="https://datosabiertos.aduana.gov.py">datosabiertos.aduana.gov.py</a></li>
+      <li>DNIT, tabla de regímenes aduaneros: <a href="https://www.dnit.gov.py/web/portal-institucional/reg%C3%ADmenes-aduaneros">dnit.gov.py</a></li>
+      <li>Ventanilla Única de Exportación (VUE), certificados de origen por categoría y país: <a href="https://www.vue.gov.py">vue.gov.py</a>. Origen de los datos: Ministerio de Industria y Comercio.</li>
+    </ul>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    Proyecto independiente de datos abiertos. Código con licencia MIT en <a href="https://github.com/silvia-mov/comercio-exterior-paraguay-dnit-mic">GitHub</a>. No representa ni cuenta con el respaldo de la DNIT ni del Ministerio de Industria y Comercio.
+  </div>
+</footer>
+
+<script>
+// [año, DNIT con acuerdo, DNIT sin acuerdo, VUE] en millones de USD FOB
+const D = [[2011,2127.8,3249.2,5811.1],[2012,2044.4,2777.5,4972.3],[2013,2996.0,4044.9,6958.0],[2014,3574.2,3721.3,7492.4],[2015,3035.6,2967.3,6012.0],[2016,3487.7,2764.9,6017.9],[2017,3632.2,2900.6,6110.6],[2018,4403.6,2470.5,6572.6],[2019,3870.9,2179.7,5813.1],[2020,4021.3,2609.3,6276.0],[2021,5299.2,3578.2,8422.5],[2022,4547.9,3629.8,12111.6],[2023,6412.6,3446.1,8339.2],[2024,6103.7,3695.9,8904.8],[2025,5421.1,4188.7,8437.5],[2026,6049.1,3745.5,8029.7]];
+const fmt = (x, d=0) => x.toLocaleString("es-PY", {minimumFractionDigits: d, maximumFractionDigits: d});
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function marco(id, h) {
+  const host = document.getElementById(id);
+  const W = Math.max(host.clientWidth, 300), narrow = W < 560;
+  const m = {l: 44, r: id === "chart1" ? 40 : 12, t: 10, b: 28};
+  const svg = el("svg", {width: W, height: h, viewBox: `0 0 ${W} ${h}`});
+  host.innerHTML = ""; host.appendChild(svg);
+  return {svg, W, h, m, narrow, iw: W - m.l - m.r, ih: h - m.t - m.b};
+}
+function ejeY(f, max, paso) {
+  for (let v = 0; v <= max; v += paso) {
+    const y = f.m.t + f.ih - v / max * f.ih;
+    el("line", {x1: f.m.l, x2: f.W - f.m.r, y1: y, y2: y, stroke: "var(--line)"}, f.svg);
+    el("text", {x: f.m.l - 6, y: y + 4, "text-anchor": "end"}, f.svg).textContent = fmt(v);
+  }
+}
+function ejeX(f, xs) {
+  D.forEach((r, i) => {
+    if (f.narrow && i % 3 !== 0 && i !== D.length - 1) return;
+    el("text", {x: xs(i), y: f.h - 8, "text-anchor": "middle"}, f.svg).textContent = f.narrow ? "'" + String(r[0]).slice(2) : r[0];
+  });
+}
+function dibujar() {
+  // Gráfico 1: barras apiladas + % con acuerdo
+  let f = marco("chart1", 300);
+  const max1 = 10000, bw = f.iw / D.length;
+  const xs = i => f.m.l + bw * (i + .5);
+  const ys = v => f.m.t + f.ih - v / max1 * f.ih;
+  ejeY(f, max1, 2500);
+  D.forEach((r, i) => {
+    const x = f.m.l + bw * i + bw * .15, w = bw * .7;
+    el("rect", {x, y: ys(r[1]), width: w, height: f.m.t + f.ih - ys(r[1]), fill: "var(--s1)", rx: 2}, f.svg);
+    el("rect", {x, y: ys(r[1] + r[2]), width: w, height: ys(r[1]) - ys(r[1] + r[2]) - 1, fill: "var(--s2)", rx: 2}, f.svg)
+      .appendChild(document.createElementNS(NS, "title")).textContent =
+        `${r[0]}: con acuerdo ${fmt(r[1])} M, sin acuerdo ${fmt(r[2])} M (${fmt(100*r[1]/(r[1]+r[2]),1)} %)`;
+  });
+  const yp = p => f.m.t + f.ih - p / 100 * f.ih;
+  el("polyline", {points: D.map((r, i) => `${xs(i)},${yp(100*r[1]/(r[1]+r[2]))}`).join(" "), fill: "none", stroke: "var(--s3)", "stroke-width": 2.5}, f.svg);
+  D.forEach((r, i) => el("circle", {cx: xs(i), cy: yp(100*r[1]/(r[1]+r[2])), r: 3, fill: "var(--s3)"}, f.svg));
+  for (let p = 0; p <= 100; p += 25)
+    el("text", {x: f.W - f.m.r + 6, y: yp(p) + 4}, f.svg).textContent = p + "%";
+  ejeX(f, xs);
+
+  // Gráfico 2: líneas VUE vs DNIT
+  f = marco("chart2", 280);
+  const max2 = 12500, bw2 = f.iw / D.length;
+  const xs2 = i => f.m.l + bw2 * (i + .5);
+  const ys2 = v => f.m.t + f.ih - v / max2 * f.ih;
+  ejeY(f, max2, 2500);
+  [[r => r[3], "var(--s3)"], [r => r[1] + r[2], "var(--text)"], [r => r[1], "var(--s1)"]].forEach(([g, c]) => {
+    el("polyline", {points: D.map((r, i) => `${xs2(i)},${ys2(g(r))}`).join(" "), fill: "none", stroke: c, "stroke-width": 2.5, "stroke-linejoin": "round"}, f.svg);
+    D.forEach((r, i) => el("circle", {cx: xs2(i), cy: ys2(g(r)), r: 3, fill: c}, f.svg));
+  });
+  ejeX(f, xs2);
+}
+dibujar();
+let t; addEventListener("resize", () => { clearTimeout(t); t = setTimeout(dibujar, 150); });
+
+// Tabla
+const tabla = document.getElementById("tabla");
+tabla.innerHTML = "<thead><tr><th>Año</th><th>VUE</th><th>DNIT total</th><th>DNIT con acuerdo</th><th>% con acuerdo</th><th>VUE / DNIT total</th></tr></thead><tbody>" +
+  D.map(r => { const tot = r[1] + r[2];
+    return `<tr><td>${r[0] === 2026 ? "2026 (ene–oct)" : r[0]}</td><td>${fmt(r[3],1)}</td><td>${fmt(tot,1)}</td><td>${fmt(r[1],1)}</td><td>${fmt(100*r[1]/tot,1)} %</td><td>${fmt(100*r[3]/tot,1)} %</td></tr>`;
+  }).join("") + "</tbody>";
+</script>
+</body>
+</html>
