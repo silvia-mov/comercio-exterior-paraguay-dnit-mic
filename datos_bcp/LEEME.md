@@ -22,6 +22,7 @@ total general.
 
 | Archivo | Contenido | Fecha de descarga |
 |---|---|---|
+| `2015/BCP_DATOS_MENSUALES_2015_A_8D.csv` | Exportaciones 2015, enero a diciembre | noviembre de 2026 |
 | `2016/BCP_DATOS_MENSUALES_2016_A_8D.csv` | Exportaciones 2016, enero a diciembre | noviembre de 2026 |
 | `2017/BCP_DATOS_MENSUALES_2017_A_8D.csv` | Exportaciones 2017, enero a diciembre | noviembre de 2026 |
 | `2018/BCP_DATOS_MENSUALES_2018_A_8D.csv` | Exportaciones 2018, enero a diciembre | noviembre de 2026 |
