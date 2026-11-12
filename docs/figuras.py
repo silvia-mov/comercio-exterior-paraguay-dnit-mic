@@ -11,6 +11,8 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
+plt.rcParams["axes.facecolor"] = "none"  # el panel toma el fondo de la figura
 import matplotlib.ticker
 import pandas as pd
 
@@ -19,6 +21,9 @@ REPORTE = RAIZ / "salidas" / "Reporte_Comercio_Paraguay_Acuerdos.xlsx"
 IMG = RAIZ / "docs" / "img"
 IMG.mkdir(parents=True, exist_ok=True)
 
+# Fondo propio (no transparente): GitHub elige la versión clara u oscura según la computadora,
+# no según el tema de GitHub, y con fondo transparente las letras pueden quedar ilegibles.
+FONDO = {"light": "#ffffff", "dark": "#0d1117"}
 TEMAS = {
     "light": dict(texto="#0b0b0b", texto2="#52514e", grilla="#e4e3df", eje="#c3c2b7",
                   con="#39b89a", sin="#fec9d7"),
@@ -70,7 +75,7 @@ def grafico_acuerdos(por_acuerdo, anio, modo, t):
     # el rosa claro no se lee como texto: cuadrado en color, etiqueta en gris
     fig.text(0.42, 0.82, "■", color=t["sin"], fontsize=10.5)
     fig.text(0.435, 0.82, "Sin acuerdo / OMC", color=t["texto2"], fontsize=10.5)
-    fig.savefig(IMG / f"acuerdos_{anio}_{modo}.png", dpi=200, transparent=True)
+    fig.savefig(IMG / f"acuerdos_{anio}_{modo}.png", dpi=200, facecolor=FONDO[modo])
     plt.close(fig)
 
 
