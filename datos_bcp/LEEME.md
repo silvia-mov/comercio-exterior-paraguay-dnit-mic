@@ -22,6 +22,7 @@ total general.
 
 | Archivo | Contenido | Fecha de descarga |
 |---|---|---|
+| `2024/BCP_DATOS_MENSUALES_2024_A_8D.csv` | Exportaciones 2024, enero a diciembre | noviembre de 2026 |
 | `2025/BCP_DATOS_MENSUALES_2025_A_8D.csv` | Exportaciones 2025, enero a diciembre | noviembre de 2026 |
 
 ## Lo que hay que saber antes de usarlos
