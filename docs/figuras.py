@@ -43,6 +43,18 @@ def millones(x, _pos=None):
     return f"{x:,.0f}".replace(",", ".")
 
 
+MESES_TXT = ["", "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+             "septiembre", "octubre", "noviembre", "diciembre"]
+
+
+def meses_del_anio(anio):
+    """Meses incluidos de un año (12 salvo el año en curso), según el resumen de la DNIT."""
+    ruta = RAIZ / "salidas" / "resumen_dnit" / f"dnit_exportaciones_{anio}.csv"
+    if ruta.exists():
+        return int(pd.read_csv(ruta, usecols=["DNIT_MESES"], nrows=1)["DNIT_MESES"].iloc[0])
+    return 12
+
+
 def grafico_acuerdos(por_acuerdo, anio, modo, t):
     fig, axes = plt.subplots(1, 2, figsize=(11, 5.2))
     fig.subplots_adjust(left=0.2, right=0.97, top=0.74, bottom=0.1, wspace=0.75)
@@ -67,7 +79,9 @@ def grafico_acuerdos(por_acuerdo, anio, modo, t):
         ax.grid(axis="x", color=t["grilla"], linewidth=0.8)
         ax.set_axisbelow(True)
         ax.set_xlabel("millones de USD (escala logarítmica)", fontsize=9, color=t["texto2"])
-    fig.text(0.01, 0.97, f"Comercio de Paraguay según el acuerdo usado, {anio}", fontsize=14,
+    n = meses_del_anio(anio)
+    periodo = f"{anio} (enero a {MESES_TXT[n]})" if n < 12 else str(anio)
+    fig.text(0.01, 0.97, f"Comercio de Paraguay según el acuerdo usado, {periodo}", fontsize=14,
              fontweight="bold", color=t["texto"], va="top")
     fig.text(0.01, 0.905, "Despachos aduaneros definitivos (datos abiertos de la DNIT).",
              fontsize=10.5, color=t["texto2"], va="top")
@@ -80,7 +94,13 @@ def grafico_acuerdos(por_acuerdo, anio, modo, t):
 
 
 def main():
-    por_acuerdo = pd.read_excel(REPORTE, sheet_name="Por acuerdo")
+    # Si existen los resúmenes por año (salidas/por_acuerdo/por_acuerdo_AAAA.csv), se grafican
+    # todos; si no, el reporte de procesar_despachos.py.
+    resumenes = sorted((RAIZ / "salidas" / "por_acuerdo").glob("por_acuerdo_*.csv"))
+    if resumenes:
+        por_acuerdo = pd.concat([pd.read_csv(r) for r in resumenes], ignore_index=True)
+    else:
+        por_acuerdo = pd.read_excel(REPORTE, sheet_name="Por acuerdo")
     for anio in sorted(por_acuerdo["AÑO"].unique()):
         for modo, t in TEMAS.items():
             grafico_acuerdos(por_acuerdo, anio, modo, t)

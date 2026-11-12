@@ -40,6 +40,8 @@ def main():
         "DNIT: regímenes definitivos, origen paraguayo, destino declarado en el despacho.",
         "VUE: certificados de origen (todos, con y sin preferencia), destino final.",
         "BCP: estadística oficial (SICEX), todos los regímenes, destino final; incluye electricidad (NCM 2716).",
+        "Por acuerdo: exportaciones (FOB) e importaciones (CIF) según el acuerdo usado en el despacho (DNIT); "
+        "el año en curso tiene los meses publicados por la DNIT.",
         "Espejo: lo que los demás países declaran haber importado desde Paraguay (UN Comtrade), solo total anual.",
         "Fuentes: DNIT (datos abiertos de aduanas); VUE (origen de los datos: Ministerio de Industria y "
         "Comercio); BCP (SICEX); UN Comtrade. Elaboración propia.",
@@ -48,12 +50,20 @@ def main():
         "Método y código: https://github.com/silvia-mov/comercio-exterior-paraguay-dnit-mic",
     ]})
 
+    # Comercio por acuerdo (exportaciones FOB e importaciones CIF), de procesar_despachos.py año por año
+    resumenes = sorted((RAIZ / "salidas" / "por_acuerdo").glob("por_acuerdo_*.csv"))
+    acuerdo = pd.concat([pd.read_csv(r) for r in resumenes], ignore_index=True) if resumenes else None
+    if acuerdo is not None:
+        acuerdo = acuerdo.rename(columns={"VALOR_DOLAR": "VALOR_USD"})
+        acuerdo.to_csv(DESTINO / "comercio_por_acuerdo.csv", index=False, encoding="utf-8-sig")
     anual.to_csv(DESTINO / "utilizacion_por_anio.csv", index=False, encoding="utf-8-sig")
     socios.to_csv(DESTINO / "utilizacion_por_socio.csv", index=False, encoding="utf-8-sig")
     pais.to_csv(DESTINO / "exportaciones_por_pais.csv", index=False, encoding="utf-8-sig")
     with pd.ExcelWriter(DESTINO / "Utilizacion_acuerdos_Paraguay_2011_2026.xlsx", engine="xlsxwriter") as w:
-        for nombre, t in (("Por año", anual), ("Utilización por socio", socios),
-                          ("Por país", pais), ("Notas", notas)):
+        hojas = [("Por año", anual), ("Utilización por socio", socios), ("Por país", pais)]
+        if acuerdo is not None:
+            hojas.append(("Por acuerdo", acuerdo))
+        for nombre, t in hojas + [("Notas", notas)]:
             t.to_excel(w, sheet_name=nombre, index=False)
             w.sheets[nombre].freeze_panes(1, 0)
             w.sheets[nombre].set_column(0, len(t.columns) - 1, 18 if nombre != "Notas" else 110)
