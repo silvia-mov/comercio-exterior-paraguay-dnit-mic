@@ -59,6 +59,28 @@ Hojas: *Por año*, *Utilización por socio*, *Por país*, *Por partida* y *Notas
 están en [`datos_bcp/`](datos_bcp/LEEME.md); los de Comtrade se bajan con
 `python/descargar_comtrade.py` (necesita una clave de UN Comtrade).
 
+## Productos que más usan los acuerdos
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/productos_exportacion_dark.png">
+  <img alt="Los 12 productos con más exportaciones que usaron un acuerdo comercial" src="docs/img/productos_exportacion_light.png">
+</picture>
+
+Para cada producto (4 y 8 dígitos de la NCM) y año: cuánto se comerció, qué parte usó un acuerdo y
+cuál fue el acuerdo principal. Sale directamente del campo "acuerdo" de cada despacho; no usa las
+listas de productos con preferencia de cada acuerdo, así que no dice qué productos *podrían* usar un
+acuerdo y no lo usan. En la [página web](https://silvia-mov.github.io/comercio-exterior-paraguay-dnit-mic/#productos)
+hay un buscador ("soja", "carne", "yerba" o un código NCM).
+
+```bash
+python python/resumen_productos.py datos_dnit --anios 2021   # salidas/productos/ (un año por vez)
+python python/productos_acuerdos.py                          # salidas/Productos_acuerdos.xlsx y docs/datos/
+python docs/figuras_productos.py                             # gráficos de esta sección
+```
+
+Los nombres cortos de los productos ("Soja en grano", "Carne bovina fresca") están en
+`config/nombres_cortos_ncm.csv` y se pueden ampliar.
+
 ## Comercio según el acuerdo usado, año por año
 
 Un gráfico por año, de exportaciones (FOB) e importaciones (CIF) según el acuerdo usado en el despacho:
@@ -113,18 +135,23 @@ producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores e
 │   ├── acuerdos.csv               # cómo se agrupa cada valor de "acuerdo" de la DNIT
 │   ├── regimenes.csv              # qué regímenes aduaneros se consideran definitivos
 │   ├── columnas.csv               # qué columnas lleva la hoja "Detalle" (SI / NO)
-│   └── paises_vue.csv             # nombres de países de la VUE -> código de país de la DNIT
+│   ├── paises_vue.csv             # nombres de países de la VUE -> código de país de la DNIT
+│   └── nombres_cortos_ncm.csv     # nombres en lenguaje común de las partidas más frecuentes
 ├── python/leer_vue.py             # junta los archivos de la VUE en una tabla
 ├── python/cruzar_dnit_vue.py      # cruce DNIT (despachos) vs. VUE (certificados de origen)
 ├── python/leer_bcp.py             # lee los reportes del SICEX del BCP
 ├── python/descargar_comtrade.py   # descarga UN Comtrade por API (datos de Paraguay y espejo)
 ├── python/cruzar_fuentes.py       # cruce de las cuatro fuentes y tasa de utilización
+├── python/resumen_productos.py    # resumen por producto (NCM) de un año de despachos
+├── python/productos_acuerdos.py   # productos que más usan los acuerdos
 ├── datos_bcp/<año>/               # exportaciones mensuales del BCP (SICEX), 2011–2026, NCM 8 dígitos
 ├── datos_vue/<año>/               # certificados de origen de la VUE, 2011–2026 (archivos mensuales)
 ├── CHANGELOG.md                   # versiones del código y qué incluye cada una
 ├── docs/GLOSARIO.md               # qué significa cada término, columna y decisión
 ├── docs/figuras.py                # gráficos del README (docs/img/)
 ├── docs/figuras_cruce.py          # gráficos del cruce de las cuatro fuentes
+├── docs/figuras_productos.py      # gráficos de productos
+├── docs/consulta_web.py           # datos del buscador por país de la página
 ├── docs/index.html                # página web del proyecto (GitHub Pages)
 ├── docs/datos_web.py              # archivos para descargar desde la página (docs/datos/)
 ├── datos_ejemplo/                 # muestra pequeña y real (enero 2025) para probar

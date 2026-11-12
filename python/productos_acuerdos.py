@@ -84,6 +84,25 @@ def tabla(t, nivel, desc):
     return r
 
 
+# Letras que en los archivos de la DNIT vienen rotas como "¿" (palabras frecuentes de la NCM)
+ARREGLOS = {"PETR¿LEO": "PETRÓLEO", "DEM¿S": "DEMÁS", "ALMID¿N": "ALMIDÓN", "F¿CULA": "FÉCULA",
+            "CART¿N": "CARTÓN", "PA¿ALES": "PAÑALES", "MA¿Z": "MAÍZ", "BIODI¿SEL": "BIODIÉSEL",
+            "SUSPENSI¿N": "SUSPENSIÓN", "ART¿CULOS": "ARTÍCULOS", "AT¿N": "ATÚN", "AZ¿CAR": "AZÚCAR",
+            "CAF¿": "CAFÉ", "T¿": "TÉ", "LIM¿N": "LIMÓN", "JAB¿N": "JABÓN", "ALGOD¿N": "ALGODÓN",
+            "CAMI¿N": "CAMIÓN", "AVI¿N": "AVIÓN", "M¿QUINAS": "MÁQUINAS", "EL¿CTRICOS": "ELÉCTRICOS",
+            "EL¿CTRICAS": "ELÉCTRICAS", "PL¿STICO": "PLÁSTICO", "PL¿STICOS": "PLÁSTICOS", "QU¿MICOS": "QUÍMICOS"}
+
+
+def descripcion_legible(texto, largo=180):
+    """Descripción oficial en minúsculas, con las letras rotas más comunes arregladas y recortada."""
+    t = str(texto)
+    for mal, bien in ARREGLOS.items():
+        t = t.replace(mal, bien)
+    t = t.replace("¿", "").strip().lower()
+    t = t[:1].upper() + t[1:]
+    return t if len(t) <= largo else t[:largo].rsplit(" ", 1)[0] + "…"
+
+
 def ranking(r, n=20):
     return (r.sort_values(["AÑO", "OPERACION", "CON_ACUERDO_USD"], ascending=[True, True, False])
              .groupby(["AÑO", "OPERACION"]).head(n))
@@ -132,7 +151,9 @@ def main():
                 if "DESCRIPCION" in cols:
                     w.sheets[nombre].set_column(cols.index("DESCRIPCION"), cols.index("DESCRIPCION"), 60)
     p4.to_csv(WEB / "productos_4_digitos.csv", index=False, encoding="utf-8-sig")
-    p8.to_csv(WEB / "productos_8_digitos.csv", index=False, encoding="utf-8-sig")
+    # 8 dígitos: comprimido (el CSV pesa ~60 MB)
+    p8.to_csv(WEB / "productos_8_digitos.zip", index=False, encoding="utf-8-sig",
+              compression={"method": "zip", "archive_name": "productos_8_digitos.csv"})
 
     # Datos del buscador por producto (4 dígitos)
     anios = sorted(p4["AÑO"].unique().tolist())
@@ -142,7 +163,7 @@ def main():
         g = g.set_index("AÑO").reindex(anios)
         v = lambda c: [None if pd.isna(x) else round(float(x)) for x in g[c]]
         prod.append({"c": cod, "o": op[0], "n": g["NOMBRE_CORTO"].dropna().iloc[-1] if g["NOMBRE_CORTO"].notna().any() else "",
-                     "d": g["DESCRIPCION"].dropna().iloc[-1] if g["DESCRIPCION"].notna().any() else "",
+                     "d": descripcion_legible(g["DESCRIPCION"].dropna().iloc[-1]) if g["DESCRIPCION"].notna().any() else "",
                      "t": v("TOTAL_USD"), "a": v("CON_ACUERDO_USD"),
                      "ac": [x if isinstance(x, str) else "" for x in g["ACUERDO_PRINCIPAL"]]})
     (WEB / "productos.json").write_text(json.dumps(

@@ -7,6 +7,11 @@
   `docs/figuras_cruce.py`.
 - **Página web**: tasa de utilización 2011–2026, por país socio, cuatro fuentes y botones para
   descargar los resultados en Excel y CSV (`docs/datos/`, generados con `docs/datos_web.py`).
+- **Productos que más usan los acuerdos** (`python/resumen_productos.py`, `python/productos_acuerdos.py`):
+  por producto (4 y 8 dígitos de la NCM) y año, total, parte con acuerdo y acuerdo principal, 2011–2026;
+  gráficos (`docs/figuras_productos.py`) y buscador por producto en la página.
+- **Buscador "Consultá un dato"** en la página: por país y año, en lenguaje simple.
+- **Gráficos por acuerdo de cada año 2011–2026** con selector de años en la página, y títulos con la conclusión.
 - **Datos del BCP** (`datos_bcp/`): exportaciones mensuales 2011–2026 a 8 dígitos de la NCM, con
   lector `python/leer_bcp.py`.
 - **Descarga de UN Comtrade** (`python/descargar_comtrade.py`): datos de Paraguay por mes y datos

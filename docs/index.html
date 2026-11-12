@@ -142,6 +142,7 @@ footer { margin-top: 48px; padding: 28px 0 48px; border-top: 1px solid var(--lin
     <a href="#resultados">Utilización</a>
     <a href="#socios">Por socio</a>
     <a href="#por-acuerdo">Por acuerdo</a>
+    <a href="#productos">Productos</a>
     <a href="#cuatro-fuentes">Cuatro fuentes</a>
     <a href="#descargas">Descargar datos</a>
     <a href="#para-que">Para qué sirve</a>
@@ -214,6 +215,39 @@ footer { margin-top: 48px; padding: 28px 0 48px; border-top: 1px solid var(--lin
     </div>
   </section>
 
+  <section id="productos">
+    <h2>La soja y sus derivados son casi la mitad de lo que se exporta con acuerdo</h2>
+    <p>Los productos que más usan los acuerdos comerciales. Cada barra es todo lo que se comerció del producto en el último año completo; la parte verde usó un acuerdo, y el número dice qué porcentaje.</p>
+    <div class="card">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="img/productos_exportacion_dark.png">
+        <img src="img/productos_exportacion_light.png" alt="Los 12 productos con más exportaciones que usaron un acuerdo comercial" loading="lazy">
+      </picture>
+    </div>
+    <div class="card">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="img/productos_importacion_dark.png">
+        <img src="img/productos_importacion_light.png" alt="Los 12 productos con más importaciones que usaron un acuerdo comercial" loading="lazy">
+      </picture>
+    </div>
+
+    <div class="consulta">
+      <h3 style="margin-top:0">Buscá un producto</h3>
+      <div class="elegir">
+        <input id="p-texto" type="search" placeholder="Por ejemplo: soja, carne, yerba, 1201" aria-label="Producto o código NCM" style="font:inherit;font-size:17px;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--text);min-width:240px;flex:1">
+        <label>Año <select id="p-anio" aria-label="Año"></select></label>
+        <label><input type="radio" name="p-op" value="E" checked> Exportaciones</label>
+        <label><input type="radio" name="p-op" value="I"> Importaciones</label>
+      </div>
+      <div id="p-lista" class="btns" style="margin-bottom:12px"></div>
+      <div class="respuesta" aria-live="polite">
+        <div id="p-res"><p class="chica">Escribí el nombre de un producto o su código NCM (4 dígitos).</p></div>
+        <div id="p-mini"></div>
+      </div>
+      <p class="note">Cada despacho dice si usó un acuerdo. No sabemos si los productos que no lo usaron tenían o no una rebaja disponible: algunos no la tienen, otros ya pagan cero para todos o siguen viaje a otro país.</p>
+    </div>
+  </section>
+
   <section id="cuatro-fuentes">
     <h2>Cuatro fuentes distintas cuentan casi lo mismo: los datos abiertos de aduanas son confiables</h2>
     <p>Las exportaciones de Paraguay se pueden medir con cuatro fuentes públicas. Sin la electricidad (que no pasa por la aduana), los despachos de la DNIT quedan entre el 94 % y el 101 % del total oficial del BCP en todos los años, y lo que los demás países declaran haber comprado a Paraguay (datos espejo) entre el 94 % y el 106 %. La VUE se aparta en 2022 y, desde 2023, cubre menos.</p>
@@ -249,6 +283,15 @@ footer { margin-top: 48px; padding: 28px 0 48px; border-top: 1px solid var(--lin
           <a class="btn" href="datos/utilizacion_por_socio.csv" download>Por socio</a>
           <a class="btn" href="datos/exportaciones_por_pais.csv" download>Por país</a>
           <a class="btn" href="datos/comercio_por_acuerdo.csv" download>Por acuerdo</a>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Productos</h3>
+        <p>Cada producto por año: total, parte con acuerdo y acuerdo principal. Excel con rankings, CSV a 4 dígitos y ZIP a 8 dígitos de la NCM.</p>
+        <div class="btns">
+          <a class="btn primary" href="datos/Productos_acuerdos_Paraguay_2011_2026.xlsx" download>Excel</a>
+          <a class="btn" href="datos/productos_4_digitos.csv" download>4 dígitos</a>
+          <a class="btn" href="datos/productos_8_digitos.zip" download>8 dígitos</a>
         </div>
       </div>
       <div class="card">
@@ -484,6 +527,74 @@ document.getElementById("tabla").innerHTML =
   sp.addEventListener("change", mostrar); sa.addEventListener("change", mostrar);
   addEventListener("resize", mostrar);
   mostrar();
+})();
+
+// ---------------- Buscá un producto
+(() => {
+  let P = null;
+  const txt = document.getElementById("p-texto"), sa = document.getElementById("p-anio"),
+        lista = document.getElementById("p-lista"), res = document.getElementById("p-res");
+  const norm = s => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const MESES = ["", "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre"];
+  const usd = v => v >= 1e9 ? `USD ${fmt(v / 1e9, 1)} mil millones` : v >= 1e6 ? `USD ${fmt(v / 1e6, v < 1e7 ? 1 : 0)} millones` : `USD ${fmt(Math.round(v / 1e3))} mil`;
+  const nombre = p => p.n || p.d.split(/[.;]/)[0];
+  let elegido = null;
+  async function cargar() {
+    if (P) return;
+    P = await (await fetch("datos/productos.json")).json();
+    [...P.anios].reverse().forEach(a => sa.add(new Option(P.parcial[a] ? `${a} (enero a ${MESES[P.parcial[a]]})` : String(a), a)));
+    sa.value = String(Math.max(...P.anios.filter(a => !P.parcial[a])));
+  }
+  const op = () => document.querySelector("input[name=p-op]:checked").value;
+  function buscar() {
+    const q = norm(txt.value.trim());
+    lista.innerHTML = "";
+    if (q.length < 2) return;
+    const i = P.anios.indexOf(+sa.value);
+    const hits = P.productos.filter(p => p.o === op() && (p.c.startsWith(q) || norm(p.n).includes(q) || norm(p.d).includes(q)))
+      .sort((a, b) => (b.t[i] || 0) - (a.t[i] || 0)).slice(0, 8);
+    if (!hits.length) { res.innerHTML = `<p>No encontramos "${txt.value}". Probá con otra palabra o con el código NCM de 4 dígitos.</p>`; document.getElementById("p-mini").innerHTML = ""; return; }
+    hits.forEach(p => { const b = document.createElement("button"); b.className = "btn"; b.type = "button";
+      const nb = nombre(p); b.textContent = `${nb.length > 40 ? nb.slice(0, 38) + "…" : nb} (${p.c})`; b.onclick = () => { elegido = p.c; mostrar(); }; lista.appendChild(b); });
+    if (!hits.some(p => p.c === elegido)) elegido = hits[0].c;
+    mostrar();
+  }
+  function mostrar() {
+    const p = P.productos.find(x => x.c === elegido && x.o === op());
+    if (!p) return;
+    const i = P.anios.indexOf(+sa.value), a = P.anios[i], t = p.t[i] || 0, con = p.a[i] || 0;
+    const cuando = P.parcial[a] ? `Entre enero y ${MESES[P.parcial[a]]} de ${a}` : `En ${a}`;
+    const verbo = p.o === "E" ? "exportó" : "importó";
+    let h = `<p><b>${nombre(p)}</b> <span class="chica">(partida ${p.c} de la NCM)</span></p>`;
+    if (t <= 0) h += `<p>${cuando}, Paraguay no ${verbo} este producto.</p>`;
+    else {
+      h += `<p>${cuando}, Paraguay ${verbo} <b class="v">${usd(t)}</b>.</p>`;
+      if (con > 0) {
+        h += `<p>De eso, <b class="v">${usd(con)} (${fmt(100 * con / t)} %)</b> usó un acuerdo comercial` + (p.ac[i] ? `, sobre todo <b>${p.ac[i]}</b>.` : ".") + `</p>`;
+        const j = p.t.findIndex(v => v > 0);
+        if (j >= 0 && j < i) h += `<p class="chica">En ${P.anios[j]}, esa parte era el ${fmt(100 * (p.a[j] || 0) / p.t[j])} %.</p>`;
+      } else h += `<p>Nada de eso usó un acuerdo comercial.</p>`;
+    }
+    h += `<p class="chica">${p.d}</p>`;
+    res.innerHTML = h;
+    const host = document.getElementById("p-mini"), W = Math.max(host.clientWidth, 280), H = 100;
+    const svg = el("svg", {width: W, height: H, viewBox: `0 0 ${W} ${H}`}); host.innerHTML = ""; host.appendChild(svg);
+    const max = Math.max(...p.t.map(v => v || 0)) || 1, bw = W / P.anios.length;
+    P.anios.forEach((an, k) => {
+      const tt = p.t[k] || 0, cc = p.a[k] || 0, x = k * bw + bw * .15, w = bw * .7, base = H - 18;
+      const hT = tt / max * (H - 28), hC = cc / max * (H - 28), o = k === i ? 1 : .45;
+      el("rect", {x, y: base - hT, width: w, height: Math.max(hT - hC, 0), fill: "var(--s2)", opacity: o, rx: 2}, svg);
+      el("rect", {x, y: base - hC, width: w, height: hC, fill: "var(--s1)", opacity: o, rx: 2}, svg);
+      const lejos = Math.abs(k - i) > (W < 500 ? 3 : 1);
+      if (k === i || ((k === 0 || k === P.anios.length - 1) && lejos))
+        el("text", {x: x + w / 2, y: H - 4, "text-anchor": "middle", "font-weight": k === i ? 700 : 400}, svg).textContent = an;
+    });
+  }
+  txt.addEventListener("focus", cargar);
+  txt.addEventListener("input", async () => { await cargar(); buscar(); });
+  sa.addEventListener("change", () => P && buscar());
+  document.querySelectorAll("input[name=p-op]").forEach(r => r.addEventListener("change", () => P && buscar()));
+  cargar();
 })();
 </script>
 </body>

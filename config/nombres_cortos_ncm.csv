@@ -7,6 +7,7 @@ partida,nombre_corto
 0207,Carne de pollo
 0402,Leche en polvo
 0407,Huevos
+0903,Yerba mate
 1001,Trigo
 1002,Centeno
 1003,Cebada
@@ -14,13 +15,17 @@ partida,nombre_corto
 1006,Arroz
 1007,Sorgo
 1101,Harina de trigo
+1108,Almidón y fécula
 1201,Soja en grano
+1205,Colza (canola)
 1206,Girasol
 1208,Harina de soja (sin grasa)
 1209,Semillas para siembra
 1214,Forrajes
+1502,Grasa bovina (sebo)
 1507,Aceite de soja
 1512,Aceite de girasol
+1514,Aceite de colza (canola)
 1517,Margarina y mezclas de aceites
 1604,Conservas de pescado
 1701,Azúcar
@@ -29,6 +34,7 @@ partida,nombre_corto
 2106,Preparaciones alimenticias
 2202,Bebidas sin alcohol
 2203,Cerveza
+2204,Vino
 2207,Alcohol etílico
 2302,Salvados y residuos de cereales
 2304,Harina y pellets de soja
@@ -56,20 +62,43 @@ partida,nombre_corto
 4107,Cueros curtidos
 4407,Madera aserrada
 4802,Papel
+4805,Papel y cartón para envases
+4811,Papel y cartón recubierto
+4818,Papel higiénico y similares
 4819,Cajas y envases de papel
 5205,Hilado de algodón
+5407,Telas sintéticas
+5601,Guata y algodón
+5603,Tela sin tejer
+5705,Alfombras
 6109,Remeras
+6115,Medias
+6203,Pantalones y trajes
+6301,Mantas
+6302,Ropa de cama y mesa
 6305,Bolsas y sacos textiles
 6403,Calzado de cuero
+6406,Partes de calzado
+6907,Pisos y baldosas cerámicas
+6908,Revestimientos cerámicos
+7204,Chatarra de hierro o acero
+7208,Chapas de acero laminado
 7210,Chapas de acero
 7214,Barras de hierro o acero
 7308,Estructuras de hierro o acero
+7408,Alambre de cobre
+7602,Desperdicios de aluminio
+7612,Envases de aluminio (latas)
+7616,Manufacturas de aluminio
+8309,Tapas y tapones
 8415,Aires acondicionados
 8418,Heladeras
+8424,Pulverizadoras
 8429,Topadoras y excavadoras
 8432,Máquinas agrícolas
 8433,Cosechadoras
 8471,Computadoras
+8504,Transformadores eléctricos
 8507,Baterías
 8517,Teléfonos celulares
 8544,Cables eléctricos
@@ -77,4 +106,6 @@ partida,nombre_corto
 8703,Autos
 8704,Camiones
 8708,Autopartes
+8901,Barcos y barcazas
 9401,Asientos y muebles
+9619,Pañales y toallas higiénicas

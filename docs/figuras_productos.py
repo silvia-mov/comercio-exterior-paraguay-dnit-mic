@@ -60,7 +60,7 @@ def main():
         verbo = "exportado" if op == "EXPORTACION" else "importado"
         for modo, t in TEMAS.items():
             fig, ax = plt.subplots(figsize=(10, 5.6))
-            fig.subplots_adjust(left=0.27, right=0.9, top=0.78, bottom=0.08)
+            fig.subplots_adjust(left=0.27, right=0.9, top=0.74, bottom=0.08)
             y = range(len(d))
             ax.barh(y, d["TOTAL_USD"] / 1e6, color=t["socios"], height=0.72)
             ax.barh(y, d["CON_ACUERDO_USD"] / 1e6, color=t["con"], height=0.72)
@@ -84,10 +84,10 @@ def main():
                      "que usaron un acuerdo comercial. El número es la parte de todo lo comerciado del\n"
                      "producto que usó un acuerdo. Despachos de la DNIT, 4 dígitos de la NCM.",
                      fontsize=10, color=t["texto2"], va="top", linespacing=1.4)
-            fig.text(0.27, 0.815, "■", color=t["con"], fontsize=11)
-            fig.text(0.285, 0.815, "Usó el acuerdo", color=t["texto2"], fontsize=10)
-            fig.text(0.42, 0.815, "■", color=t["socios"], fontsize=11)
-            fig.text(0.435, 0.815, "Sin acuerdo", color=t["texto2"], fontsize=10)
+            fig.text(0.27, 0.775, "■", color=t["con"], fontsize=11)
+            fig.text(0.285, 0.775, "Usó el acuerdo", color=t["texto2"], fontsize=10)
+            fig.text(0.42, 0.775, "■", color=t["socios"], fontsize=11)
+            fig.text(0.435, 0.775, "Sin acuerdo", color=t["texto2"], fontsize=10)
             fig.savefig(IMG / f"productos_{nombre}_{modo}.png", dpi=200, facecolor=FONDO[modo])
             plt.close(fig)
     print("Listo:", sorted(p.name for p in IMG.glob("productos_*.png")))
