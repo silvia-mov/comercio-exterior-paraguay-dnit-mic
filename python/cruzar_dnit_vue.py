@@ -114,6 +114,10 @@ def resumen_dnit_anio(carpeta, anio, regimenes_si, acuerdos):
     if sin.any():
         tabla = codigos_por_nombre()
         d.loc[sin, "CODIGO_PAIS"] = d.loc[sin, "DNIT_NOMBRE_PAIS"].map(normalizar).map(tabla)
+        # Despachos sin país de destino: se conservan como "SD" (sin dato) para no perder su valor
+        vacio = d["DNIT_NOMBRE_PAIS"].str.strip() == ""
+        d.loc[vacio, "CODIGO_PAIS"] = "SD"
+        d.loc[vacio, "DNIT_NOMBRE_PAIS"] = "SIN DATO DE PAIS"
         faltan = sorted(d.loc[d["CODIGO_PAIS"].isna(), "DNIT_NOMBRE_PAIS"].unique())
         if faltan:
             print(f"  AVISO: países sin código (agregarlos a config/paises_dnit.csv): {faltan}")
@@ -121,6 +125,7 @@ def resumen_dnit_anio(carpeta, anio, regimenes_si, acuerdos):
     d["CON"] = np.where(d["TIPO_ACUERDO"].isin(TIPOS_CON_ACUERDO), d["FOB_DOLAR"], 0.0)
     d["SIN"] = d["FOB_DOLAR"] - d["CON"]
     meses = sorted(d["MES_NUM"].unique())
+    d["CODIGO_PAIS"] = d["CODIGO_PAIS"].fillna("??")   # país sin código: no se pierde su valor
     r = (d.groupby(["AÑO_INT", "CODIGO_PAIS", "PARTIDA"], as_index=False)
           .agg(DNIT_FOB_TOTAL=("FOB_DOLAR", "sum"), DNIT_FOB_CON_ACUERDO=("CON", "sum"),
                DNIT_FOB_SIN_ACUERDO=("SIN", "sum"), DNIT_NOMBRE_PAIS=("DNIT_NOMBRE_PAIS", "first"))

@@ -104,12 +104,27 @@ def tamano_remoto(url):
         return None
 
 
-def bajar(url, destino):
-    """Descarga a un archivo temporal y lo renombra al terminar (no deja archivos a medias)."""
+def bajar(url, destino, intentos=3):
+    """Descarga a un archivo temporal y lo renombra al terminar (no deja archivos a medias).
+    Reintenta si la conexión se corta (el portal de la DNIT a veces es lento)."""
     temporal = destino.with_suffix(destino.suffix + ".parcial")
-    with abrir(url, timeout=120) as r, open(temporal, "wb") as f:
-        shutil.copyfileobj(r, f, length=1024 * 1024)
-    temporal.replace(destino)
+    for intento in range(1, intentos + 1):
+        try:
+            with abrir(url, timeout=300) as r, open(temporal, "wb") as f:
+                shutil.copyfileobj(r, f, length=1024 * 1024)
+            esperado = r.headers.get("Content-Length")
+            if esperado and int(esperado) != temporal.stat().st_size:
+                raise OSError(f"archivo incompleto ({temporal.stat().st_size} de {esperado} bytes)")
+            temporal.replace(destino)
+            return
+        except urllib.error.HTTPError:
+            temporal.unlink(missing_ok=True)
+            raise
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
+            temporal.unlink(missing_ok=True)
+            if intento == intentos:
+                raise
+            print(f"  se cortó la descarga ({e}); reintento {intento + 1} de {intentos} ...", flush=True)
 
 
 def desde_github(anio, mes, destino):
