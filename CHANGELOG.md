@@ -5,6 +5,8 @@
 - **Cruce de cuatro fuentes desde 2011** (`python/cruzar_fuentes.py`): DNIT, VUE, BCP (SICEX) y
   datos espejo de UN Comtrade; tasa de utilización anual y por país socio. Gráficos en
   `docs/figuras_cruce.py`.
+- **Página web**: tasa de utilización 2011–2026, por país socio, cuatro fuentes y botones para
+  descargar los resultados en Excel y CSV (`docs/datos/`, generados con `docs/datos_web.py`).
 - **Datos del BCP** (`datos_bcp/`): exportaciones mensuales 2011–2026 a 8 dígitos de la NCM, con
   lector `python/leer_bcp.py`.
 - **Descarga de UN Comtrade** (`python/descargar_comtrade.py`): datos de Paraguay por mes y datos

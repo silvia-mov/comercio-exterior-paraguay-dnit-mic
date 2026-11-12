@@ -119,6 +119,7 @@ producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores e
 ├── docs/figuras.py                # gráficos del README (docs/img/)
 ├── docs/figuras_cruce.py          # gráficos del cruce de las cuatro fuentes
 ├── docs/index.html                # página web del proyecto (GitHub Pages)
+├── docs/datos_web.py              # archivos para descargar desde la página (docs/datos/)
 ├── datos_ejemplo/                 # muestra pequeña y real (enero 2025) para probar
 └── datos_dnit/                    # AQUÍ van sus archivos reales (no se suben a GitHub)
 ```
