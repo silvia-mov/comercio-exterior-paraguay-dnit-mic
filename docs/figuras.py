@@ -21,9 +21,9 @@ IMG.mkdir(parents=True, exist_ok=True)
 
 TEMAS = {
     "light": dict(texto="#0b0b0b", texto2="#52514e", grilla="#e4e3df", eje="#c3c2b7",
-                  con="#2a78d6", sin="#a3a29b"),
+                  con="#39b89a", sin="#fec9d7"),
     "dark": dict(texto="#f0efec", texto2="#c3c2b7", grilla="#33332f", eje="#52514e",
-                 con="#3987e5", sin="#6f6e68"),
+                 con="#39b89a", sin="#6b3a4a"),
 }
 NOMBRES_CORTOS = {
     "MERCOSUR intrazona (ACE 18)": "MERCOSUR (ACE 18)",
@@ -67,7 +67,9 @@ def grafico_acuerdos(por_acuerdo, anio, modo, t):
     fig.text(0.01, 0.905, "Despachos aduaneros definitivos (datos abiertos de la DNIT).",
              fontsize=10.5, color=t["texto2"], va="top")
     fig.text(0.2, 0.82, "■  Con acuerdo", color=t["con"], fontsize=10.5)
-    fig.text(0.42, 0.82, "■  Sin acuerdo / OMC", color=t["sin"], fontsize=10.5)
+    # el rosa claro no se lee como texto: cuadrado en color, etiqueta en gris
+    fig.text(0.42, 0.82, "■", color=t["sin"], fontsize=10.5)
+    fig.text(0.435, 0.82, "Sin acuerdo / OMC", color=t["texto2"], fontsize=10.5)
     fig.savefig(IMG / f"acuerdos_{anio}_{modo}.png", dpi=200, transparent=True)
     plt.close(fig)
 
