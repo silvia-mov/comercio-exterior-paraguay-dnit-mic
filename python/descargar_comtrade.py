@@ -12,6 +12,16 @@ Necesita una clave de suscripción de UN Comtrade (https://comtradeplus.un.org):
 Uso (desde la raíz del repositorio):
     python python/descargar_comtrade.py --anios 2011-2026
     python python/descargar_comtrade.py --anios 2021 --nivel AG6 --flujos X
+    python python/descargar_comtrade.py --espejo --anios 2011-2025
+
+DATOS ESPEJO (--espejo)
+Lo que los demás países declaran haber importado DESDE Paraguay (informante = cada socio,
+socio = Paraguay). Es la única fuente que no sale de documentos paraguayos. Son anuales
+(pocos países publican datos mensuales completos) y a 6 dígitos del SA. El valor es CIF en
+la frontera del país comprador, por eso suele ser algo mayor que el FOB paraguayo.
+Guarda datos_comtrade/espejo/Comtrade_espejo_PRY_<año>_<nivel>.csv con:
+    AÑO, PAIS_CODIGO_ISO2, PAIS_CODIGO_ISO3, PAIS (el país que compra), PARTIDA,
+    VALOR_DOLAR (CIF del país comprador), FOB_DOLAR, CIF_DOLAR, PESO_NETO_KG, CLASIFICACION
 
 Guarda un CSV por año en datos_comtrade/<año>/Comtrade_PRY_<año>_<nivel>.csv con:
     PERIODO, AÑO, MES, FLUJO (X exportación / M importación), PAIS_CODIGO_ISO2,
@@ -123,6 +133,46 @@ def bajar_anio(anio, meses, nivel, flujos, clave, ref):
     return filas
 
 
+def bajar_espejo(anio, nivel, clave, ref):
+    """Importaciones que cada país declara desde Paraguay (datos anuales)."""
+    parametros = {
+        "partnerCode": PARAGUAY,
+        "period": anio,
+        "flowCode": "M",
+        "cmdCode": nivel,
+        "partner2Code": 0,
+        "customsCode": "C00",
+        "motCode": 0,
+    }
+    d = pedir(f"{API}/get/C/A/HS?" + urllib.parse.urlencode(parametros), clave)
+    if d.get("error"):
+        raise SystemExit(f"Error de la API: {d['error']}")
+    filas = []
+    for x in d["data"]:
+        p = ref.get(x["reporterCode"], {})
+        filas.append({
+            "AÑO": int(x["period"]),
+            "PAIS_CODIGO_ISO2": p.get("PartnerCodeIsoAlpha2", ""),
+            "PAIS_CODIGO_ISO3": p.get("PartnerCodeIsoAlpha3", ""),
+            "PAIS": p.get("PartnerDesc", "").strip() or str(x["reporterCode"]),
+            "PARTIDA": x["cmdCode"],
+            "VALOR_DOLAR": x["cifvalue"] or x["primaryValue"],
+            "FOB_DOLAR": x.get("fobvalue") or "",
+            "CIF_DOLAR": x.get("cifvalue") or "",
+            "PESO_NETO_KG": x.get("netWgt") or "",
+            "CLASIFICACION": x.get("classificationCode", ""),
+        })
+    return filas
+
+
+def guardar(filas, archivo):
+    archivo.parent.mkdir(parents=True, exist_ok=True)
+    with open(archivo, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=list(filas[0]))
+        w.writeheader()
+        w.writerows(filas)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--anios", default="2011-2026", help="por ejemplo 2021 o 2011-2026")
@@ -130,6 +180,8 @@ def main():
                     help="dígitos del SA: AG2 capítulo, AG4 partida, AG6 subpartida")
     ap.add_argument("--flujos", default="X,M", help="X exportaciones, M importaciones")
     ap.add_argument("--destino", default=str(DESTINO))
+    ap.add_argument("--espejo", action="store_true",
+                    help="bajar lo que los demás países declaran importar desde Paraguay")
     args = ap.parse_args()
 
     clave = os.environ.get("COMTRADE_KEY")
@@ -139,6 +191,22 @@ def main():
     hoy = date.today().isoformat()
 
     ref = paises()
+    if args.espejo:
+        nivel = args.nivel if args.nivel != "AG4" or "--nivel" in sys.argv else "AG6"
+        for anio in leer_rango_anios(args.anios):
+            filas = bajar_espejo(anio, nivel, clave, ref)
+            if not filas:
+                print(f"{anio}: todavía no hay datos espejo")
+                continue
+            archivo = Path(args.destino) / "espejo" / f"Comtrade_espejo_PRY_{anio}_{nivel}.csv"
+            guardar(filas, archivo)
+            n = len({r["PAIS_CODIGO_ISO3"] for r in filas})
+            tot = sum(r["VALOR_DOLAR"] for r in filas) / 1e6
+            print(f"{anio}: {n} países informan compras a Paraguay por USD {tot:,.1f} M (CIF) -> {archivo}")
+            time.sleep(1)
+        with open(Path(args.destino) / "espejo" / "descarga.txt", "w", encoding="utf-8") as f:
+            f.write(f"Fuente: UN Comtrade, importaciones de cada país desde Paraguay\nFecha de descarga: {hoy}\n")
+        return
     publicados = disponibles(clave)
     for anio in leer_rango_anios(args.anios):
         meses = sorted(p for p in publicados if p // 100 == anio)
