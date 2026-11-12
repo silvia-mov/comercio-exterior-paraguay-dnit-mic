@@ -15,3 +15,6 @@ __pycache__/
 .Rhistory
 .RData
 .Ruserdata
+
+# Datos de UN Comtrade (bajados con suscripción: no se republican)
+datos_comtrade/
