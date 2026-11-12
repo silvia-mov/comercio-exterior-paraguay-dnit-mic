@@ -18,6 +18,9 @@ Uso:
 Antes: tener los archivos de la DNIT de esos años (descargar_dnit.py) y los de la VUE
 (carpeta datos_vue/, ya incluida en el repositorio).
 
+Poco espacio en disco: el programa guarda un resumen por año en salidas/resumen_dnit/. Una vez
+resumido un año, sus archivos de la DNIT se pueden borrar; la próxima vez se usa el resumen.
+
 LO QUE HAY QUE TENER EN CUENTA (ver docs/GLOSARIO.md, sección 8):
   - La VUE cuenta TODOS los certificados de origen (preferenciales y no preferenciales);
     no indica el acuerdo. Por eso se compara con el total exportado y con "con acuerdo".
@@ -75,37 +78,63 @@ def cargar_vue(anios):
                   VUE_NOMBRE_PAIS=("PAISDESTINO", "first")))
 
 
-def cargar_dnit(carpeta, anios):
-    """Exportaciones de la DNIT por año, país y partida, con y sin acuerdo."""
-    regimenes_si, _, acuerdos = pd_dnit.cargar_config()
+def resumen_dnit_anio(carpeta, anio, regimenes_si, acuerdos):
+    """Exportaciones de la DNIT de un año, por país y partida (con y sin acuerdo)."""
     archivos = sorted(p for p in carpeta.rglob("*")
                       if p.suffix.lower() in (".json", ".txt", ".csv", ".xlsx", ".parquet")
-                      and pd_dnit.archivo_en_periodo(p, anios, "TODOS"))
+                      and pd_dnit.archivo_en_periodo(p, [anio], "TODOS"))
     if not archivos:
-        sys.exit(f"No hay archivos de la DNIT de {anios[0]}–{anios[-1]} en {carpeta}. "
-                 "Descárguelos con: python python/descargar_dnit.py --anios ...")
+        return None
     partes = []
     for ruta in archivos:
-        print(f"Leyendo {ruta.name} ...", flush=True)
+        print(f"  Leyendo {ruta.name} ...", flush=True)
         df = pd_dnit.estandarizar_columnas(pd_dnit.leer_archivo(ruta))
-        df = df[df["OPERACION"].str.startswith("EXP")]
-        partes.append(df)
+        partes.append(df[df["OPERACION"].str.startswith("EXP")])
     base = pd.concat(partes, ignore_index=True)
     con_item = base["ITEM"] != ""
     base = pd.concat([base[con_item].drop_duplicates(["DESPACHO_CIFRADO", "ITEM"]), base[~con_item]],
                      ignore_index=True)
     d = pd_dnit.transformar(base, regimenes_si, acuerdos)
-    d = d[(d["MOTIVO_EXCLUSION"] == "") & d["AÑO_INT"].isin(anios)]
+    d = d[(d["MOTIVO_EXCLUSION"] == "") & (d["AÑO_INT"] == anio)]
 
     d["CODIGO_PAIS"] = d["PAIS_PROC_DEST"].str.extract(r"^([A-Z0-9]{2}) - ")[0]
     d["DNIT_NOMBRE_PAIS"] = d["PAIS_PROC_DEST"].str.replace(r"^[A-Z0-9]{2} - ", "", regex=True)
     d["PARTIDA"] = d["POSICION_NCM"].str.replace(".", "", regex=False).str[:4]
     d["CON"] = np.where(d["TIPO_ACUERDO"].isin(TIPOS_CON_ACUERDO), d["FOB_DOLAR"], 0.0)
     d["SIN"] = d["FOB_DOLAR"] - d["CON"]
-    return (d.groupby(["AÑO_INT", "CODIGO_PAIS", "PARTIDA"], as_index=False)
-             .agg(DNIT_FOB_TOTAL=("FOB_DOLAR", "sum"), DNIT_FOB_CON_ACUERDO=("CON", "sum"),
-                  DNIT_FOB_SIN_ACUERDO=("SIN", "sum"), DNIT_NOMBRE_PAIS=("DNIT_NOMBRE_PAIS", "first"))
-             .rename(columns={"AÑO_INT": "AÑO"}))
+    meses = sorted(d["MES_NUM"].unique())
+    r = (d.groupby(["AÑO_INT", "CODIGO_PAIS", "PARTIDA"], as_index=False)
+          .agg(DNIT_FOB_TOTAL=("FOB_DOLAR", "sum"), DNIT_FOB_CON_ACUERDO=("CON", "sum"),
+               DNIT_FOB_SIN_ACUERDO=("SIN", "sum"), DNIT_NOMBRE_PAIS=("DNIT_NOMBRE_PAIS", "first"))
+          .rename(columns={"AÑO_INT": "AÑO"}))
+    r["DNIT_MESES"] = len(meses)
+    return r
+
+
+def cargar_dnit(carpeta, anios, carpeta_resumen):
+    """Un resumen por año. Si ya existe en carpeta_resumen, se reutiliza: así los archivos de la
+    DNIT de un año pueden borrarse una vez resumidos (útil con poco espacio en disco)."""
+    regimenes_si, _, acuerdos = pd_dnit.cargar_config()
+    carpeta_resumen.mkdir(parents=True, exist_ok=True)
+    partes, faltan = [], []
+    for anio in anios:
+        ruta = carpeta_resumen / f"dnit_exportaciones_{anio}.csv"
+        if ruta.exists():
+            print(f"{anio}: resumen ya calculado ({ruta.name})")
+            partes.append(pd.read_csv(ruta, dtype={"CODIGO_PAIS": str, "PARTIDA": str}, keep_default_na=False,
+                                      na_values=[""]))
+            continue
+        print(f"{anio}: procesando los archivos de la DNIT ...", flush=True)
+        r = resumen_dnit_anio(carpeta, anio, regimenes_si, acuerdos)
+        if r is None:
+            faltan.append(anio)
+            continue
+        r.to_csv(ruta, index=False, encoding="utf-8-sig")
+        partes.append(r)
+    if faltan:
+        sys.exit(f"Faltan los archivos de la DNIT de {faltan} en {carpeta}. "
+                 "Descárguelos con: python python/descargar_dnit.py --anios ...")
+    return pd.concat(partes, ignore_index=True)
 
 
 def resumir(df, claves):
@@ -126,12 +155,15 @@ def main():
     parser.add_argument("--anios", required=True, help="p. ej. 2020 o 2015-2025")
     parser.add_argument("--dnit", default="datos_dnit", help="carpeta con los archivos de la DNIT")
     parser.add_argument("--salida", default="salidas/Cruce_DNIT_VUE.xlsx")
+    parser.add_argument("--resumenes", default="salidas/resumen_dnit",
+                        help="carpeta donde se guarda el resumen anual de la DNIT (se reutiliza)")
     args = parser.parse_args()
     anios = pd_dnit.leer_rango_anios(args.anios)
     carpeta = Path(args.dnit) if Path(args.dnit).is_absolute() else RAIZ_REPO / args.dnit
 
     vue = cargar_vue(anios)
-    dnit = cargar_dnit(carpeta, anios)
+    carpeta_resumen = Path(args.resumenes) if Path(args.resumenes).is_absolute() else RAIZ_REPO / args.resumenes
+    dnit = cargar_dnit(carpeta, anios, carpeta_resumen)
     cruce = vue.merge(dnit, on=["AÑO", "CODIGO_PAIS", "PARTIDA"], how="outer")
     for c in ["VUE_FOB", "VUE_TONELADAS", "DNIT_FOB_TOTAL", "DNIT_FOB_CON_ACUERDO", "DNIT_FOB_SIN_ACUERDO"]:
         cruce[c] = cruce[c].fillna(0.0)
