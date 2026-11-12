@@ -37,6 +37,9 @@ TILDES = {"Mexico": "México", "Peru": "Perú", "Japon": "Japón", "Canada": "Ca
           "Estados Unidos De America": "Estados Unidos"}
 
 
+DIEZ = ["Cero", "Uno", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve", "Diez"]
+
+
 def miles(x, _pos=None):
     return f"{x:,.0f}".replace(",", ".")
 
@@ -51,8 +54,11 @@ def estilo(ax, t, grilla="y"):
 
 
 def titulo(fig, t, texto, sub):
+    """Título = la conclusión; subtítulo = qué se mide (en hasta dos líneas para que no se corte)."""
+    import textwrap
     fig.text(0.01, 0.975, texto, ha="left", va="top", fontsize=14, fontweight="bold", color=t["texto"])
-    fig.text(0.01, 0.905, sub, ha="left", va="top", fontsize=10.5, color=t["texto2"])
+    fig.text(0.01, 0.91, "\n".join(textwrap.wrap(sub, 135)), ha="left", va="top", fontsize=10.5,
+             color=t["texto2"], linespacing=1.4)
 
 
 def leyenda(fig, t, x, y, items):
@@ -86,7 +92,7 @@ def main():
     for modo, t in TEMAS.items():
         # ------------------------------------------------ 1. Utilización anual
         fig, ax = plt.subplots(figsize=(10, 4.8))
-        fig.subplots_adjust(left=0.07, right=0.93, top=0.74, bottom=0.12)
+        fig.subplots_adjust(left=0.07, right=0.93, top=0.7, bottom=0.12)
         con = anual["DNIT_FOB_CON_ACUERDO"] / 1e6
         sin = anual["DNIT_FOB_SIN_ACUERDO"] / 1e6
         ax.bar(anios, con, color=t["verde"], width=0.72)
@@ -103,10 +109,12 @@ def main():
         for lado in ("top", "left", "bottom", "right"):
             ax2.spines[lado].set_visible(False)
         ax2.tick_params(colors=t["texto2"], labelsize=9.5, length=0)
-        titulo(fig, t, "Exportaciones de Paraguay que usan un acuerdo comercial",
-               "Millones de USD FOB (barras) y tasa de utilización: % exportado con preferencia (línea). "
-               "Despachos de la DNIT.")
-        leyenda(fig, t, 0.07, 0.81, [("Con acuerdo", t["verde"], "■"), ("Sin acuerdo", t["rosa_claro"], "■"),
+        u = anual["UTILIZACION_PCT"]
+        titulo(fig, t, f"{DIEZ[round(u.iloc[-1] / 10)]} de cada diez dólares exportados usan un acuerdo comercial "
+               f"(en {anios[0]}, {DIEZ[round(u.iloc[0] / 10)].lower()})",
+               "Exportaciones de Paraguay con y sin preferencia, millones de USD FOB (barras), y % con acuerdo "
+               "(línea). Despachos de la DNIT.")
+        leyenda(fig, t, 0.07, 0.77, [("Con acuerdo", t["verde"], "■"), ("Sin acuerdo", t["rosa_claro"], "■"),
                                      ("% con acuerdo (eje derecho)", t["rosa"], "●")])
         if nota_parcial:
             fig.text(0.07, 0.02, nota_parcial, fontsize=8.5, color=t["texto2"])
@@ -114,7 +122,7 @@ def main():
 
         # ------------------------------------------------ 2. Cuatro fuentes
         fig, ax = plt.subplots(figsize=(10, 4.8))
-        fig.subplots_adjust(left=0.07, right=0.97, top=0.74, bottom=0.12)
+        fig.subplots_adjust(left=0.07, right=0.97, top=0.7, bottom=0.12)
         series = [
             ("BCP (oficial)", anual["BCP_SIN_ELECTRICIDAD"], t["texto"], "-"),
             ("DNIT (despachos)", anual["DNIT_FOB_TOTAL"], t["verde"], "-"),
@@ -126,9 +134,11 @@ def main():
         ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(miles))
         ax.set_xticks(anios, etiquetas)
         estilo(ax, t)
-        titulo(fig, t, "Exportaciones de Paraguay según cuatro fuentes",
-               "Millones de USD, sin electricidad. El espejo está en CIF (incluye flete y seguro hasta el comprador).")
-        leyenda(fig, t, 0.07, 0.81, [(n, c, "●") for n, _, c, _ in series])
+        r = (anual["DNIT_FOB_TOTAL"] / anual["BCP_SIN_ELECTRICIDAD"] * 100)
+        titulo(fig, t, "Cuatro fuentes distintas cuentan casi lo mismo: los datos abiertos de aduanas son confiables",
+               f"Exportaciones de Paraguay, millones de USD, sin electricidad. La DNIT queda entre el {int(r.min())} % y "
+               f"el {int(-(-r.max() // 1))} % del dato oficial del BCP. El espejo está en CIF.")
+        leyenda(fig, t, 0.07, 0.77, [(n, c, "●") for n, _, c, _ in series])
         nota = "En 2022 los archivos de la VUE tienen valores atípicos (octubre y noviembre)."
         if nota_parcial:
             nota += " " + nota_parcial + " El espejo de ese año todavía no existe."
@@ -139,7 +149,7 @@ def main():
         principales = (socios.groupby(["CODIGO_PAIS", "PAIS"])["DNIT_FOB_CON_ACUERDO"].sum()
                        .sort_values(ascending=False).head(6).reset_index())
         fig, axes = plt.subplots(2, 3, figsize=(10, 5.6), sharex=True, sharey=True)
-        fig.subplots_adjust(left=0.07, right=0.98, top=0.8, bottom=0.1, hspace=0.42, wspace=0.12)
+        fig.subplots_adjust(left=0.07, right=0.98, top=0.77, bottom=0.1, hspace=0.42, wspace=0.12)
         for ax, (_, p) in zip(axes.flat, principales.iterrows()):
             d = socios[socios["CODIGO_PAIS"] == p["CODIGO_PAIS"]].set_index("AÑO").reindex(anios)
             ax.fill_between(anios, d["UTILIZACION_PCT"], color=t["verde"], alpha=0.18, linewidth=0)
@@ -154,9 +164,14 @@ def main():
             ax.set_yticks([0, 50, 100], ["0 %", "50 %", "100 %"])
             ax.set_xticks([anios[0], anios[len(anios) // 2], anios[-1]])
             estilo(ax, t)
-        titulo(fig, t, "Tasa de utilización por país socio",
-               "% de lo exportado a cada país que usó una preferencia arancelaria. Los 6 socios con más "
-               "exportaciones con acuerdo (DNIT).")
+        ult = {p["PAIS"]: socios[(socios["CODIGO_PAIS"] == p["CODIGO_PAIS"])].sort_values("AÑO")["UTILIZACION_PCT"].iloc[-1]
+               for _, p in principales.iterrows()}
+        orden = sorted(ult, key=ult.get, reverse=True)
+        nom = lambda x: TILDES.get(x.title(), x.title())
+        titulo(fig, t, f"Con {nom(orden[0])} y {nom(orden[1])}, más del {int(ult[orden[1]] // 5 * 5)} % usa el acuerdo; "
+               f"con {nom(orden[-1])}, solo el {ult[orden[-1]]:.0f} %",
+               "Tasa de utilización: % de lo exportado a cada país que usó una preferencia arancelaria. Los 6 socios "
+               f"con más exportaciones con acuerdo (DNIT), último año: {anios[-1]}.")
         if nota_parcial:
             fig.text(0.07, 0.01, nota_parcial, fontsize=8.5, color=t["texto2"])
         guardar(fig, "utilizacion_socios", modo)

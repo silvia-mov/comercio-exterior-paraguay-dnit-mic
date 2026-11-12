@@ -81,9 +81,14 @@ def grafico_acuerdos(por_acuerdo, anio, modo, t):
         ax.set_xlabel("millones de USD (escala logarítmica)", fontsize=9, color=t["texto2"])
     n = meses_del_anio(anio)
     periodo = f"{anio} (enero a {MESES_TXT[n]})" if n < 12 else str(anio)
-    fig.text(0.01, 0.97, f"Comercio de Paraguay según el acuerdo usado, {periodo}", fontsize=14,
-             fontweight="bold", color=t["texto"], va="top")
-    fig.text(0.01, 0.905, "Despachos aduaneros definitivos (datos abiertos de la DNIT).",
+    # Título con la conclusión (Storytelling with Data); el subtítulo dice qué se mide
+    d = por_acuerdo[por_acuerdo["AÑO"] == anio]
+    pct = {op: 100 * d.loc[(d["OPERACION"] == op) & (d["TIPO_ACUERDO"] != "SIN_ACUERDO"), "VALOR_DOLAR"].sum()
+           / d.loc[d["OPERACION"] == op, "VALOR_DOLAR"].sum() for op in ("EXPORTACION", "IMPORTACION")}
+    fig.text(0.01, 0.97, f"En {anio}, el {pct['EXPORTACION']:.0f} % de lo exportado y el {pct['IMPORTACION']:.0f} % "
+             "de lo importado usaron un acuerdo comercial", fontsize=14, fontweight="bold", color=t["texto"], va="top")
+    fig.text(0.01, 0.905, f"Comercio de Paraguay según el acuerdo usado, {periodo}. Millones de USD. "
+             "Despachos aduaneros definitivos (datos abiertos de la DNIT).",
              fontsize=10.5, color=t["texto2"], va="top")
     fig.text(0.2, 0.82, "■  Con acuerdo", color=t["con"], fontsize=10.5)
     # el rosa claro no se lee como texto: cuadrado en color, etiqueta en gris
