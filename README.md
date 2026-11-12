@@ -56,8 +56,9 @@ python docs/figuras_cruce.py             # gráficos de esta sección
 ```
 
 Hojas: *Por año*, *Utilización por socio*, *Por país*, *Por partida* y *Notas*. Los datos del BCP
-están en [`datos_bcp/`](datos_bcp/LEEME.md); los de Comtrade se bajan con
-`python/descargar_comtrade.py` (necesita una clave de UN Comtrade).
+están en [`datos_bcp/`](datos_bcp/LEEME.md) y los datos espejo de UN Comtrade en
+[`datos_comtrade/`](datos_comtrade/LEEME.md) (fuente: UN Comtrade). Para actualizarlos:
+`python/descargar_comtrade.py --espejo` (necesita una clave de UN Comtrade; la gratuita alcanza).
 
 ## Productos que más usan los acuerdos
 
@@ -145,6 +146,7 @@ producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores e
 ├── python/resumen_productos.py    # resumen por producto (NCM) de un año de despachos
 ├── python/productos_acuerdos.py   # productos que más usan los acuerdos
 ├── datos_bcp/<año>/               # exportaciones mensuales del BCP (SICEX), 2011–2026, NCM 8 dígitos
+├── datos_comtrade/espejo/         # lo que los socios declaran comprar a Paraguay (UN Comtrade), 2011–2025
 ├── datos_vue/<año>/               # certificados de origen de la VUE, 2011–2026 (archivos mensuales)
 ├── CHANGELOG.md                   # versiones del código y qué incluye cada una
 ├── docs/GLOSARIO.md               # qué significa cada término, columna y decisión

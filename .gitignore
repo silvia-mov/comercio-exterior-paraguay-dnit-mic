@@ -16,5 +16,8 @@ __pycache__/
 .RData
 .Ruserdata
 
-# Datos de UN Comtrade (bajados con suscripción: no se republican)
-datos_comtrade/
+# Datos de UN Comtrade: solo se publican los datos espejo (menos de 100.000 registros,
+# permitido por la licencia de UN Comtrade); el resto queda en local
+datos_comtrade/*
+!datos_comtrade/espejo/
+!datos_comtrade/LEEME.md
