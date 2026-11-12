@@ -10,11 +10,54 @@ Con los despachos aduaneros públicos de la DNIT, de 1997 a hoy.
 ![Datos](https://img.shields.io/badge/datos-DNIT%201997–2026-0b6e4f)
 ![Licencia](https://img.shields.io/badge/licencia-MIT-green)
 
-[Página web](https://silvia-mov.github.io/comercio-exterior-paraguay-dnit-mic/) · [Resultados](#resultados-2021) · [Para qué sirve](#para-qué-sirve) · [Inicio rápido](#inicio-rápido) · [Datos](#tres-formas-de-conseguir-los-datos) · [Glosario](docs/GLOSARIO.md)
+[Página web](https://silvia-mov.github.io/comercio-exterior-paraguay-dnit-mic/) · [Utilización 2011–2026](#utilización-de-los-acuerdos-20112026) · [Resultados 2021](#resultados-2021) · [Para qué sirve](#para-qué-sirve) · [Inicio rápido](#inicio-rápido) · [Datos](#tres-formas-de-conseguir-los-datos) · [Glosario](docs/GLOSARIO.md)
 
 </div>
 
 ---
+
+## Utilización de los acuerdos, 2011–2026
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/utilizacion_anual_dark.png">
+  <img alt="Exportaciones de Paraguay con y sin acuerdo y tasa de utilización, 2011-2026" src="docs/img/utilizacion_anual_light.png">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/utilizacion_socios_dark.png">
+  <img alt="Tasa de utilización por país socio, 2011-2026" src="docs/img/utilizacion_socios_light.png">
+</picture>
+
+La **tasa de utilización** es la parte de lo exportado que usó efectivamente una preferencia de un
+acuerdo comercial: pasó de **40 % en 2011 a 56–65 % desde 2016**. Se calcula con los despachos de
+la DNIT (numerador y denominador de la misma fuente). 2026: enero a septiembre.
+
+### Las cuatro fuentes coinciden
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/fuentes_dark.png">
+  <img alt="Exportaciones de Paraguay según cuatro fuentes, 2011-2026" src="docs/img/fuentes_light.png">
+</picture>
+
+| Fuente | Qué mide | Detalle |
+|---|---|---|
+| **DNIT** | Despachos de aduana: regímenes definitivos, destino declarado, con o sin acuerdo | NCM 8 dígitos |
+| **VUE** (MIC) | Certificados de origen emitidos: destino final | Partida (4 dígitos) |
+| **BCP** (SICEX) | Estadística oficial: todos los regímenes, destino final, incluye electricidad | NCM 8 dígitos |
+| **Espejo** (UN Comtrade) | Lo que cada país declara haber comprado a Paraguay (CIF) | SA 6 dígitos |
+
+Sin electricidad, la DNIT queda entre el 94 % y el 101 % del total oficial del BCP en todos los
+años, y el espejo entre el 94 % y el 106 %: los datos abiertos de aduanas sirven para medir el
+comercio. La VUE se aparta en 2022 (valores atípicos en sus archivos) y desde 2023 cubre menos.
+
+```bash
+python python/cruzar_fuentes.py          # salidas/Cruce_4_fuentes.xlsx
+python docs/figuras_cruce.py             # gráficos de esta sección
+```
+
+Hojas: *Por año*, *Utilización por socio*, *Por país*, *Por partida* y *Notas*. Los datos del BCP
+están en [`datos_bcp/`](datos_bcp/LEEME.md); los de Comtrade se bajan con
+`python/descargar_comtrade.py` (necesita una clave de UN Comtrade).
 
 ## Resultados 2021
 
@@ -66,10 +109,15 @@ producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores e
 │   └── paises_vue.csv             # nombres de países de la VUE -> código de país de la DNIT
 ├── python/leer_vue.py             # junta los archivos de la VUE en una tabla
 ├── python/cruzar_dnit_vue.py      # cruce DNIT (despachos) vs. VUE (certificados de origen)
+├── python/leer_bcp.py             # lee los reportes del SICEX del BCP
+├── python/descargar_comtrade.py   # descarga UN Comtrade por API (datos de Paraguay y espejo)
+├── python/cruzar_fuentes.py       # cruce de las cuatro fuentes y tasa de utilización
+├── datos_bcp/<año>/               # exportaciones mensuales del BCP (SICEX), 2011–2026, NCM 8 dígitos
 ├── datos_vue/<año>/               # certificados de origen de la VUE, 2011–2026 (archivos mensuales)
 ├── CHANGELOG.md                   # versiones del código y qué incluye cada una
 ├── docs/GLOSARIO.md               # qué significa cada término, columna y decisión
 ├── docs/figuras.py                # gráficos del README (docs/img/)
+├── docs/figuras_cruce.py          # gráficos del cruce de las cuatro fuentes
 ├── docs/index.html                # página web del proyecto (GitHub Pages)
 ├── datos_ejemplo/                 # muestra pequeña y real (enero 2025) para probar
 └── datos_dnit/                    # AQUÍ van sus archivos reales (no se suben a GitHub)

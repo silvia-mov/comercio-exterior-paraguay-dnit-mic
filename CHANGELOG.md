@@ -1,5 +1,15 @@
 # Versiones
 
+## Sin publicar (próxima v1.1.0)
+
+- **Cruce de cuatro fuentes desde 2011** (`python/cruzar_fuentes.py`): DNIT, VUE, BCP (SICEX) y
+  datos espejo de UN Comtrade; tasa de utilización anual y por país socio. Gráficos en
+  `docs/figuras_cruce.py`.
+- **Datos del BCP** (`datos_bcp/`): exportaciones mensuales 2011–2026 a 8 dígitos de la NCM, con
+  lector `python/leer_bcp.py`.
+- **Descarga de UN Comtrade** (`python/descargar_comtrade.py`): datos de Paraguay por mes y datos
+  espejo (`--espejo`). Necesita una clave de UN Comtrade.
+
 ## v1.0.0 (noviembre de 2026)
 
 Primera versión del código para medir el comercio exterior de Paraguay según el acuerdo
