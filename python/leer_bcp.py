@@ -43,6 +43,8 @@ def leer_archivo(ruta):
             "VALOR": pd.to_numeric(d[col], errors="coerce").fillna(0).values,
         }))
     largo = pd.concat(partes, ignore_index=True)
+    # Sin código o sin país, pivot_table descartaría la fila sin avisar
+    assert largo["PRODUCTO"].notna().all() and largo["PAIS"].notna().all(), f"{ruta}: filas sin producto o país"
     t = (largo.pivot_table(index=["AÑO", "MES", "PRODUCTO", "PAIS"], columns="MEDIDA",
                            values="VALOR", aggfunc="sum").reset_index())
     t.columns.name = None
@@ -52,6 +54,14 @@ def leer_archivo(ruta):
     t["PARTIDA"] = t["NCM"].str[:4]
     t["CODIGO_PAIS"] = t["PAIS"].map(normalizar).map(codigos_por_nombre()).fillna("??")
     t["ELECTRICIDAD"] = t["PARTIDA"] == "2716"
+    # Control: el total coincide con la fila "Total" del archivo (que el BCP calcula con decimales;
+    # las filas vienen redondeadas a dólares, por eso se tolera una diferencia pequeña).
+    total = pd.read_csv(ruta, sep="\t", dtype=str, encoding="utf-8")
+    total = total[total.iloc[:, 0].str.strip() == "Total"]
+    col = [c for c in total.columns if c.endswith("TOTAL FOB DOLAR")]
+    if len(total) and col:
+        diferencia = abs(t["FOB_DOLAR"].sum() - float(total[col[0]].iloc[0]))
+        assert diferencia < 1000, f"{ruta}: el total leído difiere en USD {diferencia:,.0f} del archivo"
     return t[["AÑO", "MES", "NCM", "PARTIDA", "DESCRIPCION", "CODIGO_PAIS", "PAIS",
               "KILOS_NETOS", "FOB_DOLAR", "ELECTRICIDAD"]]
 

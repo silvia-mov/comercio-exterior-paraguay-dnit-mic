@@ -43,6 +43,8 @@ def main():
         "Espejo: lo que los demás países declaran haber importado desde Paraguay (UN Comtrade), solo total anual.",
         "Fuentes: DNIT (datos abiertos de aduanas); VUE (origen de los datos: Ministerio de Industria y "
         "Comercio); BCP (SICEX); UN Comtrade. Elaboración propia.",
+        "CODIGO_PAIS = NA es Namibia, no un dato faltante: al leer los CSV, desactivar la conversión de "
+        "'NA' (pandas: keep_default_na=False; R: na = '').",
         "Método y código: https://github.com/silvia-mov/comercio-exterior-paraguay-dnit-mic",
     ]})
 

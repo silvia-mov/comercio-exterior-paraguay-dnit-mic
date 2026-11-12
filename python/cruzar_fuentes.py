@@ -170,11 +170,19 @@ def main():
     nombres = (pd.concat([dnit[["CODIGO_PAIS", "DNIT_NOMBRE_PAIS"]].rename(columns={"DNIT_NOMBRE_PAIS": "PAIS"}),
                           bcp[["CODIGO_PAIS", "BCP_NOMBRE_PAIS"]].rename(columns={"BCP_NOMBRE_PAIS": "PAIS"})])
                .dropna().drop_duplicates("CODIGO_PAIS").set_index("CODIGO_PAIS")["PAIS"])
+    # Controles (McKinney, Python for Data Analysis, caps. 8 y 10): ninguna clave vacía (groupby las
+    # descarta sin avisar) ni repetida (un merge de muchos a muchos duplica valores).
+    for nombre, t in (("DNIT", dnit), ("VUE", vue), ("BCP", bcp), ("ESPEJO", espejo)):
+        assert not t[CLAVES].isna().any().any(), f"{nombre}: claves vacías"
+        assert not t.duplicated(CLAVES).any(), f"{nombre}: claves repetidas"
     base = (dnit.drop(columns="DNIT_NOMBRE_PAIS")
-            .merge(vue, on=CLAVES, how="outer")
-            .merge(bcp.drop(columns="BCP_NOMBRE_PAIS"), on=CLAVES, how="outer")
-            .merge(espejo, on=CLAVES, how="outer"))
+            .merge(vue, on=CLAVES, how="outer", validate="one_to_one")
+            .merge(bcp.drop(columns="BCP_NOMBRE_PAIS"), on=CLAVES, how="outer", validate="one_to_one")
+            .merge(espejo, on=CLAVES, how="outer", validate="one_to_one"))
     base[MEDIDAS] = base[MEDIDAS].fillna(0.0)
+    # El cruce no cambia los totales de ninguna fuente
+    for col, t in (("DNIT_FOB_TOTAL", dnit), ("VUE_FOB", vue), ("BCP_FOB", bcp), ("ESPEJO_CIF", espejo)):
+        assert abs(base[col].sum() - t[col].sum()) < 1, f"{col}: el cruce cambió el total"
     base["PAIS"] = base["CODIGO_PAIS"].map(nombres).fillna(base["CODIGO_PAIS"])
 
     por_anio = agregar(base, ["AÑO"])
