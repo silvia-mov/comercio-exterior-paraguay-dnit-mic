@@ -22,6 +22,7 @@ total general.
 
 | Archivo | Contenido | Fecha de descarga |
 |---|---|---|
+| `2019/BCP_DATOS_MENSUALES_2019_A_8D.csv` | Exportaciones 2019, enero a diciembre | noviembre de 2026 |
 | `2020/BCP_DATOS_MENSUALES_2020_A_8D.csv` | Exportaciones 2020, enero a diciembre | noviembre de 2026 |
 | `2021/BCP_DATOS_MENSUALES_2021_A_8D.csv` | Exportaciones 2021, enero a diciembre | noviembre de 2026 |
 | `2022/BCP_DATOS_MENSUALES_2022_A_8D.csv` | Exportaciones 2022, enero a diciembre | noviembre de 2026 |
