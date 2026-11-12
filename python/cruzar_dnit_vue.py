@@ -78,6 +78,15 @@ def cargar_vue(anios):
                   VUE_NOMBRE_PAIS=("PAISDESTINO", "first")))
 
 
+def codigos_por_nombre():
+    """Nombre de país normalizado -> código de la DNIT (config/paises_dnit.csv y paises_vue.csv)."""
+    tabla = {}
+    for archivo, col in (("paises_vue.csv", "pais_vue"), ("paises_dnit.csv", "pais_dnit")):
+        t = pd.read_csv(RAIZ_REPO / "config" / archivo, dtype=str, keep_default_na=False)
+        tabla.update(dict(zip(t[col].map(normalizar), t["codigo_dnit"])))
+    return tabla
+
+
 def resumen_dnit_anio(carpeta, anio, regimenes_si, acuerdos):
     """Exportaciones de la DNIT de un año, por país y partida (con y sin acuerdo)."""
     archivos = sorted(p for p in carpeta.rglob("*")
@@ -97,8 +106,17 @@ def resumen_dnit_anio(carpeta, anio, regimenes_si, acuerdos):
     d = pd_dnit.transformar(base, regimenes_si, acuerdos)
     d = d[(d["MOTIVO_EXCLUSION"] == "") & (d["AÑO_INT"] == anio)]
 
+    # Desde ~2016 el país viene como "BR - BRASIL"; antes, muchas veces solo "BRASIL".
+    # Sin código, se busca el nombre en config/paises_dnit.csv (y en paises_vue.csv).
     d["CODIGO_PAIS"] = d["PAIS_PROC_DEST"].str.extract(r"^([A-Z0-9]{2}) - ")[0]
     d["DNIT_NOMBRE_PAIS"] = d["PAIS_PROC_DEST"].str.replace(r"^[A-Z0-9]{2} - ", "", regex=True)
+    sin = d["CODIGO_PAIS"].isna()
+    if sin.any():
+        tabla = codigos_por_nombre()
+        d.loc[sin, "CODIGO_PAIS"] = d.loc[sin, "DNIT_NOMBRE_PAIS"].map(normalizar).map(tabla)
+        faltan = sorted(d.loc[d["CODIGO_PAIS"].isna(), "DNIT_NOMBRE_PAIS"].unique())
+        if faltan:
+            print(f"  AVISO: países sin código (agregarlos a config/paises_dnit.csv): {faltan}")
     d["PARTIDA"] = d["POSICION_NCM"].str.replace(".", "", regex=False).str[:4]
     d["CON"] = np.where(d["TIPO_ACUERDO"].isin(TIPOS_CON_ACUERDO), d["FOB_DOLAR"], 0.0)
     d["SIN"] = d["FOB_DOLAR"] - d["CON"]
