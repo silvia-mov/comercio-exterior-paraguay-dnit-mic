@@ -74,11 +74,14 @@ En los datos de 2021 aparecen estos códigos: `MERCOSUR`, `AAP.CE 74`, `AAP.CE 1
 `MERCOBOLIVIA`, `MERCOSURCOLOMBIA`, `MERCOPERU`, `MERCOSURCAN`, `ALADI-PAR4`, `MERCOSURISRAEL`,
 `MEXICO AAP-38`, `MERCOSUREGIPTO`, `MERCOSURCUBA`, además de `OMC` y `SIN ACUERDO`.
 
-Hay acuerdos vigentes para Paraguay que **conviene revisar año por año** porque pueden no tener un
-código identificable en estos datos: **MERCOSUR–India** (vigente desde 2009), **Paraguay–Taiwán**
-(2017), el **ACE 55 MERCOSUR–México** (sector automotor) y **MERCOSUR–Singapur** (vigente desde el
-1/02/2026). Si un acuerdo no tiene código, su comercio queda dentro de *Sin acuerdo* y **no se puede
-medir su utilización** con estos datos. El acuerdo MERCOSUR–Unión Europea ya está previsto en
+Hay acuerdos vigentes para Paraguay que **no aparecen en estos datos**: en los despachos de 2011 a
+2026, ningún ítem tiene un código de **MERCOSUR–India** (vigente desde 2009), **Paraguay–Taiwán**
+(2018), **MERCOSUR–Singapur** (vigente desde el 1/02/2026) ni del **ACE 55 MERCOSUR–México** (sector
+automotor). Todo el comercio con esos socios queda dentro de *Sin acuerdo* (por ejemplo, en 2025:
+India, importaciones USD 188,9 millones y exportaciones 23,2; Taiwán, 79,4 y 343,3; vehículos de
+México 2023–2025: 115,6 sin acuerdo, 2,1 con la PAR 4 y 0,1 con el AAP.R 38) y **no se puede medir su
+utilización**. Con estos datos no se puede saber si el sistema no tiene un código para esos acuerdos o
+si de verdad no se usan; habría que consultarlo con la DNIT. El acuerdo MERCOSUR–Unión Europea ya está previsto en
 `config/acuerdos.csv` (código `MERCOSURUE`).
 
 ### Si aparece un acuerdo nuevo
