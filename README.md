@@ -3,14 +3,15 @@
 # Comercio exterior de Paraguay por acuerdo comercial
 
 **¿Cuánto exporta e importa Paraguay usando efectivamente cada acuerdo comercial?**<br>
-Con los despachos aduaneros públicos de la DNIT, de 1997 a hoy.
+Con datos abiertos de la DNIT (aduanas), la VUE (MIC), el BCP y UN Comtrade, 2011–2026.<br>
+Por país, por producto y por acuerdo, con una [página web](https://silvia-mov.github.io/comercio-exterior-paraguay-dnit-mic/) con buscadores en lenguaje simple.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
 ![R](https://img.shields.io/badge/R-4.x-276DC3?logo=r&logoColor=white)
-![Datos](https://img.shields.io/badge/datos-DNIT%201997–2026-0b6e4f)
+![Datos](https://img.shields.io/badge/datos-DNIT%20·%20VUE%20·%20BCP%20·%20Comtrade-0b6e4f)
 ![Licencia](https://img.shields.io/badge/licencia-MIT-green)
 
-[Página web](https://silvia-mov.github.io/comercio-exterior-paraguay-dnit-mic/) · [Utilización 2011–2026](#utilización-de-los-acuerdos-20112026) · [Resultados 2021](#resultados-2021) · [Para qué sirve](#para-qué-sirve) · [Inicio rápido](#inicio-rápido) · [Datos](#tres-formas-de-conseguir-los-datos) · [Glosario](docs/GLOSARIO.md)
+[Página web](https://silvia-mov.github.io/comercio-exterior-paraguay-dnit-mic/) · [Utilización 2011–2026](#utilización-de-los-acuerdos-20112026) · [Para qué sirve](#para-qué-sirve) · [Inicio rápido](#inicio-rápido) · [Datos](#tres-formas-de-conseguir-los-datos) · [Glosario](docs/GLOSARIO.md)
 
 </div>
 
@@ -89,21 +90,6 @@ Un gráfico por año, de exportaciones (FOB) e importaciones (CIF) según el acu
 
 Se generan con `python docs/figuras.py` a partir de `salidas/por_acuerdo/` (un resumen por año de `procesar_despachos.py`).
 
-## Resultados 2021
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/img/acuerdos_2021_dark.png">
-  <img alt="Comercio de Paraguay según el acuerdo usado, 2021" src="docs/img/acuerdos_2021_light.png">
-</picture>
-
-| | Con acuerdo | Sin acuerdo | Total | % con acuerdo |
-|---|---:|---:|---:|---:|
-| **Exportaciones** (FOB) | USD 5.299 M | USD 3.578 M | USD 8.877 M | **59,7 %** |
-| **Importaciones** (CIF) | USD 3.732 M | USD 9.110 M | USD 12.842 M | **29,1 %** |
-
-<sub>"Con acuerdo" = el despacho usó una preferencia: MERCOSUR (ACE 18), acuerdos del MERCOSUR con
-terceros y acuerdos ALADI. Sin electricidad (no pasa por la aduana). Detalle en el [Glosario](docs/GLOSARIO.md).</sub>
-
 ## Para qué sirve
 
 Para medir, con **datos abiertos y métodos públicos**, cuánto exporta e importa Paraguay
@@ -124,6 +110,21 @@ comercio exterior**.
 
 Las versiones **Python** y **R** aplican la misma metodología, leen la misma configuración y
 producen el mismo reporte (verificado con los 12 meses de 2021: mismos valores en todas las hojas).
+
+## Ejemplo: un año en detalle (2021)
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/acuerdos_2021_dark.png">
+  <img alt="Comercio de Paraguay según el acuerdo usado, 2021" src="docs/img/acuerdos_2021_light.png">
+</picture>
+
+| | Con acuerdo | Sin acuerdo | Total | % con acuerdo |
+|---|---:|---:|---:|---:|
+| **Exportaciones** (FOB) | USD 5.299 M | USD 3.578 M | USD 8.877 M | **59,7 %** |
+| **Importaciones** (CIF) | USD 3.732 M | USD 9.110 M | USD 12.842 M | **29,1 %** |
+
+<sub>"Con acuerdo" = el despacho usó una preferencia: MERCOSUR (ACE 18), acuerdos del MERCOSUR con
+terceros y acuerdos ALADI. Sin electricidad (no pasa por la aduana). Detalle en el [Glosario](docs/GLOSARIO.md).</sub>
 
 ## Estructura
 

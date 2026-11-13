@@ -119,6 +119,24 @@ pre code { padding: 0; background: none; }
 details { border-bottom: 1px solid var(--line); padding: 10px 0; max-width: 760px; }
 summary { cursor: pointer; font-weight: 600; }
 footer { margin-top: 48px; padding: 28px 0 48px; border-top: 1px solid var(--line); font-size: 14px; color: var(--text2); }
+/* Versión para imprimir o guardar en PDF */
+@media print {
+  @page { size: A4; margin: 14mm 12mm; }
+  :root { --bg: #ffffff; --panel: #ffffff; }
+  body { background: #fff !important; font-size: 11pt; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  header { padding: 18px 0 16px !important; }
+  nav.toc, .btns, .controls, .slider, .elegir, #p-lista, .tip, footer .btn { display: none !important; }
+  section { padding: 14px 0 0 !important; }
+  .card, .kpi, .respuesta, .explica, .big-answer, table, .steps li, .consulta, .dl .card { break-inside: avoid; }
+  h2, h3, .sub, section > p { break-after: avoid; }
+  section { break-inside: avoid; }
+  #r-explica { display: none !important; }
+  h2 { font-size: 16pt; }
+  .card { box-shadow: none; }
+  a { color: inherit; text-decoration: none; }
+  .tw { overflow: visible; }
+}
 </style>
 </head>
 <body>
