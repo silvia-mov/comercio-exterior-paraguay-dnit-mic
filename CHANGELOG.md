@@ -2,6 +2,10 @@
 
 ## Sin publicar (próxima v1.1.0)
 
+- **Excel por año para descargar** (`docs/descargas/`, `python/excel_descargas.py`): DNIT resumida por
+  producto, país y acuerdo; BCP mensual; VUE con los 12 meses unidos. Calibri 10, hoja de tabla
+  dinámica ya armada y hoja de notas. Los Excel de resultados también traen tabla dinámica.
+
 - **Cruce de cuatro fuentes desde 2011** (`python/cruzar_fuentes.py`): DNIT, VUE, BCP (SICEX) y
   datos espejo de UN Comtrade; tasa de utilización anual y por país socio. Gráficos en
   `docs/figuras_cruce.py`.

@@ -83,6 +83,19 @@ python docs/figuras_productos.py                             # gráficos de esta
 Los nombres cortos de los productos ("Soja en grano", "Carne bovina fresca") están en
 `config/nombres_cortos_ncm.csv` y se pueden ampliar.
 
+### Excel por año para descargar
+
+En `docs/descargas/` hay un Excel por año (2011–2026) de cada fuente, en Calibri 10, con tres hojas:
+**Datos**, **Tabla dinámica** (ya armada) y **Notas**. DNIT: resumen por producto (NCM 8 dígitos),
+país y acuerdo (los despachos completos superan el millón de filas de Excel). BCP: SICEX por mes,
+producto y país. VUE: los 12 archivos mensuales unidos, sin cambiar los valores. Se rehacen con:
+
+```bash
+python python/excel_descargas.py      # después de docs/datos_web.py y python/productos_acuerdos.py
+```
+
+La tabla dinámica la arma `python/tabla_dinamica.py` con LibreOffice (requiere `soffice` y `python3-uno`).
+
 ## Comercio según el acuerdo usado, año por año
 
 Un gráfico por año, de exportaciones (FOB) e importaciones (CIF) según el acuerdo usado en el despacho:
@@ -157,6 +170,8 @@ terceros y acuerdos ALADI. Sin electricidad (no pasa por la aduana). Detalle en 
 ├── docs/consulta_web.py           # datos del buscador por país de la página
 ├── docs/index.html                # página web del proyecto (GitHub Pages)
 ├── docs/datos_web.py              # archivos para descargar desde la página (docs/datos/)
+├── docs/descargas/                # un Excel por año y fuente, con tabla dinámica
+├── python/excel_descargas.py      # arma esos Excel (python/tabla_dinamica.py agrega la tabla)
 ├── datos_ejemplo/                 # muestra pequeña y real (enero 2025) para probar
 └── datos_dnit/                    # AQUÍ van sus archivos reales (no se suben a GitHub)
 ```

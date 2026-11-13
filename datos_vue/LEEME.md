@@ -55,3 +55,5 @@ no al exportado con acuerdo. Ver el [Glosario](../docs/GLOSARIO.md#8-datos-de-la
 | 2021 a 2026 | Están en el servidor de la VUE pero la página no los enlaza. |
 | 2023, febrero | No es una planilla: contiene instrucciones de base de datos (`Insert into …`). El programa lo lee igual. |
 | 2022, octubre y noviembre | Contienen valores imposibles en la partida 6406 (partes de calzado) a Brasil: USD 1.078 millones por 57 t y USD 2.943 millones por 42 t, y en la 3904 (plásticos), USD 230 millones por 183 t. Inflan 2022 en unos USD 4.000 millones. Se dejan tal como vienen. |
+
+Los 12 meses de cada año unidos en un solo Excel, con tabla dinámica y sin cambiar los valores: `docs/descargas/vue/` (también desde la página web).

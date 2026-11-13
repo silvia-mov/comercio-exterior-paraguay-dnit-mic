@@ -103,6 +103,9 @@ th { color: var(--text2); font-weight: 600; }
 #mini svg text { font-size: 11px; }
 select { font: inherit; font-size: 15px; padding: 6px 10px; margin: 0 0 12px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--text); }
 .card img { width: 100%; height: auto; display: block; border-radius: 6px; }
+.anual { margin: 0 0 12px; }
+.anual label { font-weight: 600; }
+.anual .btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 8px; }
 .dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
 .dl .card { margin: 0; display: flex; flex-direction: column; }
 .dl .card h3 { margin-top: 0; }
@@ -287,10 +290,21 @@ footer { margin-top: 48px; padding: 28px 0 48px; border-top: 1px solid var(--lin
   <section id="descargas">
     <h2>Descargar los datos</h2>
     <p>Los resultados de esta página y las fuentes originales, libres para usar. Si los usa, cite las fuentes (ver las notas de cada archivo).</p>
+    <div class="card anual">
+      <h3>Un Excel por año, listo para usar</h3>
+      <p>Cada archivo trae tres hojas: <b>Datos</b> (la tabla completa del año), <b>Tabla dinámica</b> (ya armada: se cambian filas, columnas y filtros con un clic) y <b>Notas</b> (fuente y qué es cada columna).</p>
+      <label>Año <select id="dl-anio" aria-label="Año del archivo"></select></label>
+      <div class="btns">
+        <a class="btn primary" id="dl-dnit" href="descargas/dnit/DNIT_2025.xlsx" download>DNIT: por producto, país y acuerdo</a>
+        <a class="btn" id="dl-bcp" href="descargas/bcp/BCP_2025.xlsx" download>BCP: por mes, producto y país</a>
+        <a class="btn" id="dl-vue" href="descargas/vue/VUE_2025.xlsx" download>VUE: los 12 meses juntos</a>
+      </div>
+      <p class="note">DNIT: exportaciones e importaciones sumadas por producto (NCM 8 dígitos), país y acuerdo, porque los despachos completos superan el millón de filas que admite Excel. BCP: exportaciones del SICEX a 8 dígitos. VUE: certificados de origen; origen de los datos: Ministerio de Industria y Comercio. 2026: año incompleto.</p>
+    </div>
     <div class="dl">
       <div class="card">
         <h3>Resultados en Excel</h3>
-        <p>Tasa de utilización por año y por país socio, exportaciones e importaciones por acuerdo, y exportaciones por país según la DNIT, la VUE y el BCP, 2011–2026, con notas.</p>
+        <p>Tasa de utilización por año y por país socio, exportaciones e importaciones por acuerdo, y exportaciones por país según la DNIT, la VUE y el BCP, 2011–2026, con notas y una tabla dinámica.</p>
         <div class="btns"><a class="btn primary" href="datos/Utilizacion_acuerdos_Paraguay_2011_2026.xlsx" download>Descargar Excel</a></div>
       </div>
       <div class="card">
@@ -305,7 +319,7 @@ footer { margin-top: 48px; padding: 28px 0 48px; border-top: 1px solid var(--lin
       </div>
       <div class="card">
         <h3>Productos</h3>
-        <p>Cada producto por año: total, parte con acuerdo y acuerdo principal. Excel con rankings, CSV a 4 dígitos y ZIP a 8 dígitos de la NCM.</p>
+        <p>Cada producto por año: total, parte con acuerdo y acuerdo principal. Excel con rankings y tabla dinámica, CSV a 4 dígitos y ZIP a 8 dígitos de la NCM.</p>
         <div class="btns">
           <a class="btn primary" href="datos/Productos_acuerdos_Paraguay_2011_2026.xlsx" download>Excel</a>
           <a class="btn" href="datos/productos_4_digitos.csv" download>4 dígitos</a>
@@ -313,12 +327,12 @@ footer { margin-top: 48px; padding: 28px 0 48px; border-top: 1px solid var(--lin
         </div>
       </div>
       <div class="card">
-        <h3>BCP, mensual a 8 dígitos</h3>
+        <h3>BCP, archivos originales</h3>
         <p>Exportaciones por mes, código NCM y país, 2011–2026, tal como las exporta el SICEX del Banco Central del Paraguay.</p>
         <div class="btns"><a class="btn" href="https://github.com/silvia-mov/comercio-exterior-paraguay-dnit-mic/tree/main/datos_bcp">Ver archivos</a></div>
       </div>
       <div class="card">
-        <h3>VUE, certificados de origen</h3>
+        <h3>VUE, archivos originales</h3>
         <p>Archivos mensuales 2011–2026 de la Ventanilla Única de Exportación. Origen de los datos: Ministerio de Industria y Comercio.</p>
         <div class="btns"><a class="btn" href="https://github.com/silvia-mov/comercio-exterior-paraguay-dnit-mic/tree/main/datos_vue">Ver archivos</a></div>
       </div>
@@ -633,6 +647,23 @@ document.getElementById("tabla").innerHTML =
   sa.addEventListener("change", () => P && buscar());
   document.querySelectorAll("input[name=p-op]").forEach(r => r.addEventListener("change", () => P && buscar()));
   cargar();
+})();
+</script>
+<script>
+(function () {
+  var sel = document.getElementById("dl-anio");
+  if (!sel) return;
+  for (var a = 2026; a >= 2011; a--) {
+    var o = document.createElement("option"); o.value = a; o.textContent = a + (a === 2026 ? " (incompleto)" : "");
+    if (a === 2025) o.selected = true; sel.appendChild(o);
+  }
+  function poner() {
+    var a = sel.value;
+    document.getElementById("dl-dnit").href = "descargas/dnit/DNIT_" + a + ".xlsx";
+    document.getElementById("dl-bcp").href = "descargas/bcp/BCP_" + a + ".xlsx";
+    document.getElementById("dl-vue").href = "descargas/vue/VUE_" + a + ".xlsx";
+  }
+  sel.addEventListener("change", poner); poner();
 })();
 </script>
 </body>

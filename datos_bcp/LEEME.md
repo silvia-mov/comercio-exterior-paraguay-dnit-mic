@@ -56,3 +56,5 @@ Según la *Nota técnica metodológica de elaboración de las estadísticas de c
   deberían cambiar. Por eso cada archivo indica la fecha de descarga: si se vuelve a bajar un
   año reciente, puede diferir.
 - Fecha de registro: la de cancelación del despacho, igual que en los datos abiertos de la DNIT.
+
+Versión en Excel, un archivo por año con tabla dinámica: `docs/descargas/bcp/` (también desde la página web).
