@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "Si usás este repositorio o sus datos, citalo así y citá también las fuentes originales (DNIT, VUE/MIC, BCP y UN Comtrade)."
+title: "Comercio exterior de Paraguay por acuerdo comercial (DNIT, VUE, BCP y UN Comtrade)"
+abstract: "Código abierto en Python y R para medir cuánto exporta e importa Paraguay usando efectivamente cada acuerdo comercial, con los datos abiertos de aduanas de la DNIT, cruzados con los certificados de origen de la VUE (MIC), las estadísticas del BCP y los datos espejo de UN Comtrade, 2011–2026."
+type: software
+authors:
+  - alias: silvia-mov
+repository-code: "https://github.com/silvia-mov/comercio-exterior-paraguay-dnit-mic"
+url: "https://silvia-mov.github.io/comercio-exterior-paraguay-dnit-mic/"
+license: MIT
+date-released: "2026-11-13"
+keywords:
+  - international trade
+  - trade agreements
+  - preference utilization
+  - customs data
+  - open data
+  - Paraguay
+  - MERCOSUR
